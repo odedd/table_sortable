@@ -1,0 +1,3 @@
+- columns.each do |col|
+  - options = {label: col.label, column: col}
+  = render("#{controller_path}/table_sortable/#{col.template}_header", options) rescue render('table_sortable/header', options)
