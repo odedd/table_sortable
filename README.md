@@ -1,8 +1,12 @@
 # TableSortable
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/table_sortable`. To experiment with that code, run `bin/console` for an interactive prompt.
+TableSortable will help you leverage the power of the pager widget or plugin 
+for the excellent tablesorter jQuery plugin, and handle all the backend filtering, paging and sorting for you.
 
-TODO: Delete this and the text above, and describe your gem
+NOTICE: This gem is in INCREDIBLY early stages of development.
+It is still**not documented**nor is it**properly tested**, 
+so I strongly discourage you from using it for anything 
+other than playing around at this point.
 
 ## Installation
 
@@ -22,7 +26,7 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+Coming soon...
 
 ## Development
 

@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["davidovoded@gmail.com"]
 
   spec.summary       = 'Use jquery-tablesorter.js with server side filtering, pagination and sorting'
-  # spec.description   = %q{TODO: Write a longer description or delete this line.}
+  spec.description   = 'Use jquery-tablesorter.js with server side filtering, pagination and sorting'
   # spec.homepage      = "TODO: Put your gem's website or public repo URL here."
   spec.license       = "MIT"
 
