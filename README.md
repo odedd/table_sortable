@@ -4,7 +4,7 @@ TableSortable will help you leverage the power of the pager widget or plugin
 for the excellent tablesorter jQuery plugin, and handle all the backend filtering, paging and sorting for you.
 
 NOTICE: This gem is in INCREDIBLY early stages of development.
-It is still**not documented**nor is it**properly tested**, 
+It is still **not documented** nor is it **properly tested**, 
 so I strongly discourage you from using it for anything 
 other than playing around at this point.
 
