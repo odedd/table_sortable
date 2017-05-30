@@ -66,7 +66,7 @@ end
 ```
 
 In our view we can use our [view helpers](#view-helpers) to render our table.
-```er
+```erb
 #views/users/index.html.erb
 <div id="usersPager"><%= table_sortable_pager %></div>
 <table id="usersTable" data-query="<%= users_path %>">
