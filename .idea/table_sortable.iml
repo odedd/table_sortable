@@ -157,7 +157,6 @@
     <orderEntry type="library" scope="PROVIDED" name="erubi (v1.6.0, RVM: ruby-2.4.1 [tablesortable]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="globalid (v0.4.0, RVM: ruby-2.4.1 [tablesortable]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="i18n (v0.8.1, RVM: ruby-2.4.1 [tablesortable]) [gem]" level="application" />
-    <orderEntry type="library" scope="PROVIDED" name="kaminari (v0.17.0, RVM: ruby-2.4.1 [tablesortable]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="loofah (v2.0.3, RVM: ruby-2.4.1 [tablesortable]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="mail (v2.6.5, RVM: ruby-2.4.1 [tablesortable]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="method_source (v0.8.2, RVM: ruby-2.4.1 [tablesortable]) [gem]" level="application" />

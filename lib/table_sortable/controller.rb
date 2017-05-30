@@ -39,8 +39,8 @@ module TableSortable
     def filter_and_sort(scope)
       cols = @columns.sort_by(display_order)
 
-      page = params[:page]
-      page_size = params[:pagesize]
+      page = params[:page].to_i
+      page_size = params[:pagesize].to_i
       sort_by_col_data = params[SCOL] ? params[SCOL].keys.first : column_offset
       sort_order = params[SCOL] ? params[SCOL].values.first : SORT_ASC
 
@@ -60,8 +60,7 @@ module TableSortable
       end
       scope = filters.last.call(scope)
       if page
-        scope = Kaminari.paginate_array(scope)
-        scope = scope.page(page.to_i + 1).per(page_size)
+        scope = Result.new(scope, page, page_size)
       end
       scope
     end
