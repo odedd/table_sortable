@@ -1,5 +1,7 @@
 # TableSortable
 
+[![Build Status](https://travis-ci.org/odedd/table_sortable.svg?branch=master)](https://travis-ci.org/odedd/table_sortable)
+
 TableSortable is a Rails complementation of The **tableSorter jQuery plugin**.
 
 The tableSorter jQuery plugin is an excellent tool for filtering and sorting tables. 
