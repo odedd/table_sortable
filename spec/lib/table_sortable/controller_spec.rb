@@ -48,4 +48,9 @@ describe TableSortable::Controller do
       expect(populated_controller.send(:sort_order)).to eq [:column_with_sql_procs_a, :column_with_sql_procs_b, :column_with_array_procs]
     end
   end
+
+  context 'filter_and_sort' do
+    it 'should filter a record_set based on its filters'
+    it 'should sort a record_set based on its filters'
+  end
 end

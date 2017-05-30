@@ -1,6 +1,8 @@
 require 'rails/engine'
 require 'active_support/concern'
 require 'action_controller'
+require 'kaminari'
+require 'kaminari/models/array_extension'
 
 module TableSortable
 
