@@ -1,6 +1,8 @@
 # TableSortable
 
-The **tableSorter jQuery plugin** is an excellent tool for filtering and sorting tables. 
+TableSortable is a Rails complementation of The **tableSorter jQuery plugin**.
+
+The tableSorter jQuery plugin is an excellent tool for filtering and sorting tables. 
 When dealing with lots of rows, we usually want to split the table into multiple pages. tableSorter has a nifty [widget](https://mottie.github.io/tablesorter/docs/example-pager-ajax.html) for that, which requires using [mottie's fork](https://mottie.github.io/tablesorter/docs/index.html) of tableSorter.
 
 Usually this is a scenario where we don't want to send our entire set of records to the front end,
