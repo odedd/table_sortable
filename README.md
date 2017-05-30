@@ -2,17 +2,22 @@
 
 [![Build Status](https://travis-ci.org/odedd/table_sortable.svg?branch=master)](https://travis-ci.org/odedd/table_sortable)
 
-TableSortable is a Rails complementation of The **tableSorter jQuery plugin**.
+TableSortable adds multi-column, **server-side** filtering, sorting and pagination 
+to the **tableSorter jQuery plugin**, so you don't have to worry about interpreting the query parameters,
+customizing queries, fields to sort by, or how to send the correct page to the client.
 
-The tableSorter jQuery plugin is an excellent tool for filtering and sorting tables. 
+It is a Rails backend complementation to the frontend tableSorter.js.
+
+
+#### The Problem
+The jQuery tableSorter plugin is an excellent tool for filtering and sorting tables. 
 When dealing with lots of rows, we usually want to split the table into multiple pages. tableSorter has a nifty [widget](https://mottie.github.io/tablesorter/docs/example-pager-ajax.html) for that, which requires using [mottie's fork](https://mottie.github.io/tablesorter/docs/index.html) of tableSorter.
 
-Usually this is a scenario where we don't want to send our entire set of records to the front end,
-which consequently means that the front end no longer knows the entire set of records to filter and sort through.
-This requires our *server* to handle all that stuff, plus the pagination of the results. 
+Usually this is a scenario where we don't want to send our entire set of records to the frontend,
+which consequently means that the frontend no longer knows the entire set of records to filter and sort through.
+This requires our *server* to handle all that stuff, as well as the pagination of the results.
 
-#### That's where TableSortable comes in!
-
+#### The Solution: TableSortable
 TableSortable will handle all the backend filtering, sorting and pagination for you.
 
 NOTICE: This gem is in very early stages of development, and is not yet fully documented.  Any input will be more than welcome.
