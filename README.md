@@ -11,10 +11,9 @@ This requires our *server* to handle all that stuff, plus the pagination of the 
 
 #### That's where TableSortable comes in!
 
-TableSortable will handle all the backend filtering, sorting and paging for you.
+TableSortable will handle all the backend filtering, sorting and pagination for you.
 
-NOTICE: This gem is in very early stages of development, and is not yet fully documented.  
-Any input will be more than welcome.
+NOTICE: This gem is in very early stages of development, and is not yet fully documented.  Any input will be more than welcome.
 
 ## Installation
 
@@ -67,7 +66,7 @@ end
 ```
 
 In our view we can use our [view helpers](#view-helpers) to render our table.
-```erbruby
+```er
 #views/users/index.html.erb
 <div id="usersPager"><%= table_sortable_pager %></div>
 <table id="usersTable" data-query="<%= users_path %>">
