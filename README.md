@@ -1,12 +1,18 @@
 # TableSortable
 
-TableSortable will help you leverage the power of the pager widget or plugin 
-for the excellent tablesorter jQuery plugin, and handle all the backend filtering, paging and sorting for you.
+The **tableSorter jQuery plugin** is an excellent tool for filtering and sorting tables. 
+When dealing with lots of rows, we usually want to split the table into multiple pages. tableSorter has a nifty [widget](https://mottie.github.io/tablesorter/docs/example-pager-ajax.html) for that, which requires using [mottie's fork](https://mottie.github.io/tablesorter/docs/index.html) of tableSorter.
 
-NOTICE: This gem is in INCREDIBLY early stages of development.
-It is still **not documented** nor is it **properly tested**, 
-so I strongly discourage you from using it for anything 
-other than playing around at this point.
+Usually this is a scenario where we don't want to send our entire set of records to the front end,
+which consequently means that the front end no longer knows the entire set of records to filter and sort through.
+This requires our *server* to handle all that stuff, plus the pagination of the results. 
+
+#### That's where TableSortable comes in!
+
+TableSortable will handle all the backend filtering, sorting and paging for you.
+
+NOTICE: This gem is in very early stages of development, and is not yet fully documented.  
+Any input will be more than welcome.
 
 ## Installation
 
@@ -16,16 +22,97 @@ Add this line to your application's Gemfile:
 gem 'table_sortable'
 ```
 
-And then execute:
+Then run `bundle install` and you're ready to start
 
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install table_sortable
+You should also probably be using jquery-tablesorter.  
+For information regarding integration or tableSorter into your Rails project, 
+please see the [jQuery tablesorter plugin for Rails](https://github.com/themilkman/jquery-tablesorter-rails) page.
 
 ## Usage
 
+First, we need to setup our controller.  
+Let's say we have our users controller. Let's include TableSortable so that we can use its methods.
+
+```ruby
+#controllers/users_controller.rb
+class UsersController < ApplicationController
+  include TableSortable
+```
+
+Next, let's define our columns.
+```ruby
+#controllers/users_controller.rb
+class UsersController < ApplicationController
+  include TableSortable
+  
+  define_colunns :first_name, :last_name, :email, :created_at
+```
+That's the basic setup of columns. For more configuration options, please see [advanced configuration](#advanced-configuration).
+
+Now we need to make sure our `index` action filters, sorts and paginates the records.  
+We can do that using the `filter_and_sort` method.
+```ruby
+#controllers/users_controller.rb
+def index
+  
+  @users = filter_and_sort(User.all)
+  
+  respond_to do |format|
+        format.html {}
+        format.json {render layout: false}
+  end
+end
+```
+
+In our view we can use our [view helpers](#view-helpers) to render our table.
+```erbruby
+#views/users/index.html.erb
+<div id="usersPager"><%= table_sortable_pager %></div>
+<table id="usersTable" data-query="<%= users_path %>">
+    <thead>
+        <tr>
+            <%= table_sortable_headers %>
+        </tr>
+    </thead>
+</table>
+```
+
+Let's say we have a tableSorter table which poll's the database for data. Here's a simple configuration example for that:
+
+```javascript
+var table = $('#usersTable');
+table.tablesorter({
+    widgets: ['filter', 'pager'],
+    widgetOptions: {
+        // show 10 records at a time
+        pager_size: 10,
+        // Poll our users_index_path.
+        // A better practice would be to use the table's 
+        // data-query attribute instead, but more on that later)
+        pager_ajaxUrl: table.data('query') + '?pagesize={size}&page={page}&{filterList:fcol}&{sortList:scol}',
+        // Parse the incoming result
+        pager_ajaxProcessing: function (data) {
+            if (data && data.hasOwnProperty('rows')) {
+                // Update the pager output
+                this.pager_output = data.pager_output;
+                // return total records, the rows HTML data,
+                // and the headers information.
+                return [data.total, $(data.rows), data.headers];
+            }
+        }
+    }
+});
+```
+For full documentation regarding the usage of tableSorter please go [here](https://mottie.github.io/tablesorter/docs/index.html) for the very popular fork by mottie, or [here](http://tablesorter.com/docs/) for the original version of the plugin.
+
+Now, the results fetched from the server would be filtered, sorter and paginated by TableSortable.
+
+Of course there are many more configuration options that make TableSortable flexible and adaptable. For those, please see [advanced configuration](#advanced-configuration)
+
+## Advanced Configuration
+Coming soon...
+
+### View Helpers
 Coming soon...
 
 ## Development
@@ -36,7 +123,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/table_sortable. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+Bug reports and pull requests are welcome on GitHub at https://github.com/odedd/table_sortable. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
 
 ## License
 

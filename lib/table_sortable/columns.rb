@@ -10,11 +10,6 @@ module TableSortable
       @columns << TableSortable::Column.new(col_name, options)
     end
 
-    def define_column(col_name, *options)
-      options = options.extract_options!
-      @columns << TableSortable::Column.new(col_name, options)
-    end
-
     def sort_by(sort_key)
       if sort_key
         sort_key.map{|c| @columns.find{|col| (c.is_a?(String) ? (col.label == c) : col.name == c)}}

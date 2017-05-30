@@ -1,5 +1,8 @@
 module Test
   class Controller < ActionController::Base
+
+    include TableSortable::Controller
+
     def index
     end
   end

@@ -5,7 +5,32 @@ module TableSortable
 
     included do
       helper_method :columns
-      before_action :initialize_table_sortable
+      prepend_before_action :initialize_table_sortable
+    end
+
+    module ClassMethods
+      def define_columns(*args)
+        options = args.extract_options!
+        column_offset = options[:offset] || 0
+        columns   = args
+        before_action(options) do
+          columns.each do |column|
+            define_column column
+          end
+          self.column_offset = column_offset
+        end
+      end
+
+      def define_column(*args)
+        before_action do
+          define_column *args
+        end
+      end
+    end
+
+    def define_column(col_name, *options)
+      options = options.extract_options!
+      @columns.add(col_name, options)
     end
 
     private
@@ -26,7 +51,7 @@ module TableSortable
 
       # a filter exists
       if params[FCOL]
-        @columns.sort_by(filter_order).each_with_index do |col, i|
+        @columns.sort_by(filter_order.reverse).each_with_index do |col, i|
           column_index = cols.index(col) + column_offset
           filter_value = params[FCOL][column_index.to_s]
           filters << ->(records){ filter_value.nil? ? filters[i].call(records) : filters[i].call(records.instance_exec(filter_value, col, &col.filter.proc)) }
@@ -47,21 +72,16 @@ module TableSortable
 
     end
 
-    def define_column(col_name, *options)
-      options = options.extract_options!
-      @columns.add(col_name, options)
-    end
-
     def columns(record = nil)
       @columns.sort_by(display_order)
     end
 
     def filter_order
-      (@filter_order || @columns.sort{ |a,b| a.filter.method && b.filter.method ? b.filter.method <=> a.filter.method : a.filter.method ? 1 : -1 }.compact.map{|col| col.name}).reverse
+      @filter_order || @columns.sort{ |a,b| a.filter.method && b.filter.method ? b.filter.method <=> a.filter.method : a.filter.method ? 1 : -1 }.compact.map{|col| col.name}
     end
 
     def sort_order
-      (@sort_order || @columns.sort{ |a,b| a.sorter.method && b.sorter.method ? b.sorter.method <=> a.sorter.method : a.filter.method ? 1 : -1 }.compact.map{|col| col.name}).reverse
+      @sort_order || @columns.sort{ |a,b| a.sorter.method && b.sorter.method ? b.sorter.method <=> a.sorter.method : a.filter.method ? 1 : -1 }.compact.map{|col| col.name}
     end
 
     public

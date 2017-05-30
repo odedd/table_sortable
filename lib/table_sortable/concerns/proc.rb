@@ -10,10 +10,9 @@ module TableSortable
       def initialize(option_name, *options)
         options = options.extract_options!
         unless options[option_name] == false
-          filter = options[option_name] || options[:column].name
+          filter = options[option_name] || options[:column_name]
           @method = options["#{option_name.to_s}_method".to_sym] || :array
-
-          if filter.is_a? Proc
+          if filter.respond_to? :call
             @proc = -> (records, col=nil) { instance_exec(records, &filter) }
             @method = detect_method(@proc)
           elsif !filter.nil?
@@ -34,6 +33,14 @@ module TableSortable
 
       def disabled?
         method.nil?
+      end
+
+      def array_proc
+        raise NotImplementedError
+      end
+
+      def sql_proc
+        raise NotImplementedError
       end
 
     end

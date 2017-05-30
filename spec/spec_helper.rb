@@ -17,6 +17,7 @@
 require 'table_sortable'
 require 'support/controller_macros'
 require 'support/matchers/have_filters'
+require 'support/shared_stuff'
 
 RSpec.configure do |config|
 

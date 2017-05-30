@@ -23,7 +23,3 @@ require 'table_sortable/column'
 require 'table_sortable/columns'
 require 'table_sortable/version'
 require 'table_sortable/controller'
-
-class ActionController::Base
-  include TableSortable::Controller
-end
