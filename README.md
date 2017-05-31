@@ -4,18 +4,17 @@
 
 TableSortable adds multi-column, **server-side** filtering, sorting and pagination 
 to the **tableSorter jQuery plugin**, so you don't have to worry about interpreting the query parameters,
-customizing queries, fields to sort by, or how to send the correct page to the client.
+combining multiple queries, columns to sort by, or figuring out how to send the correct page back to the client.
 
 It is a Rails backend complementation to the frontend tableSorter.js.
 
-
 #### The Problem
 The jQuery tableSorter plugin is an excellent tool for filtering and sorting tables. 
-When dealing with lots of rows, we usually want to split the table into multiple pages. tableSorter has a nifty [widget](https://mottie.github.io/tablesorter/docs/example-pager-ajax.html) for that, which requires using [mottie's fork](https://mottie.github.io/tablesorter/docs/index.html) of tableSorter.
+Often, when dealing with lots of rows, we may want to split the table into multiple pages. tableSorter.js has a nifty [widget](https://mottie.github.io/tablesorter/docs/example-pager-ajax.html) for that, which requires using [mottie's fork](https://mottie.github.io/tablesorter/docs/index.html) of tableSorter.
 
 Usually this is a scenario where we don't want to send our entire set of records to the frontend,
-which consequently means that the frontend no longer knows the entire set of records to filter and sort through.
-This requires our *server* to handle all that stuff, as well as the pagination of the results.
+which consequently means that the frontend no longer knows the entire set of records to filter and sort through,
+which eventually requires our *server* to handle all that stuff as well as the pagination of the results.
 
 #### The Solution: TableSortable
 TableSortable will handle all the backend filtering, sorting and pagination for you.
@@ -33,13 +32,13 @@ gem 'table_sortable'
 Then run `bundle install` and you're ready to start
 
 You should also probably be using jquery-tablesorter.  
-For information regarding integration or tableSorter into your Rails project, 
+For information regarding integration or tableSorter.js into your Rails project, 
 please see the [jQuery tablesorter plugin for Rails](https://github.com/themilkman/jquery-tablesorter-rails) page.
 
 ## Usage
 
-First, we need to setup our controller.  
-Let's say we have our users controller. Let's include TableSortable so that we can use its methods.
+First, we need to setup our controller. Let's say we have our users controller. 
+Let's `include TableSortable` so that we can use its methods.
 
 ```ruby
 #controllers/users_controller.rb
@@ -55,7 +54,7 @@ class UsersController < ApplicationController
   
   define_colunns :first_name, :last_name, :email, :created_at
 ```
-That's the basic setup of columns. For more configuration options, please see [advanced configuration](#advanced-configuration).
+That's just the basic setup of columns. For more configuration options, please see [advanced configuration](#advanced-configuration).
 
 Now we need to make sure our `index` action filters, sorts and paginates the records.  
 We can do that using the `filter_and_sort` method.
@@ -66,27 +65,50 @@ def index
   @users = filter_and_sort(User.all)
   
   respond_to do |format|
-        format.html {}
-        format.json {render layout: false}
+    format.html {}
+    format.json {render layout: false}
   end
 end
 ```
 
-In our view we can use TableSortable's [view helpers](#view-helpers) to render our table.
+`index.html` should render the initial table without the rows. They will be later polled via ajax by
+tableSorter.js. We can use TableSortable's [view helpers](#view-helpers) to render our table.
 ```erb
 #views/users/index.html.erb
-<div id="usersPager"><%= table_sortable_pager %></div>
+
+<div id="usersPager">
+    <%= table_sortable_pager %>
+</div>
+
 <table id="usersTable" data-query="<%= users_path %>">
     <thead>
         <tr>
             <%= table_sortable_headers %>
         </tr>
     </thead>
+    <tbody>
+    </tbody>
 </table>
 ```
+Let's create `index.json.jbuilder` to send the info back to the frontend.
+```ruby
+# views/users/index.json.jbuilder
+# Since we only send out the current page of users, 
+# we must also send the total number of records.
+# We'll use TableSortable's total_count method for that.
+json.total @users.total_count
+json.rows @users.map{|user| render partial: 'user_row.html.erb', locals: {user: user}}.join
+json.pager_output 'Users {startRow} to {endRow} of {totalRows}'
+```
+We should also create the _user_row.html partial. In it, we may also use TableSortable's [helpers](#view-helpers).
+```erb
+#views/users/_user_row.html.erb
+<tr>
+    <%= table_sortable_columns user %>
+</tr>
+```
 
-Let's say we have a tableSorter table which poll's the database for data. Here's a simple configuration example for that:
-
+We're all done configuring the backend - now to the frontend. Here's a simple tableSorter.js configuration example:
 ```javascript
 var table = $('#usersTable');
 table.tablesorter({
@@ -94,9 +116,7 @@ table.tablesorter({
     widgetOptions: {
         // show 10 records at a time
         pager_size: 10,
-        // Poll our users_index_path.
-        // A better practice would be to use the table's 
-        // data-query attribute instead, but more on that later)
+        // Poll our users_index_path, which we receive from the table's data-query attribute.
         pager_ajaxUrl: table.data('query') + '?pagesize={size}&page={page}&{filterList:fcol}&{sortList:scol}',
         // Parse the incoming result
         pager_ajaxProcessing: function (data) {
@@ -105,15 +125,15 @@ table.tablesorter({
                 this.pager_output = data.pager_output;
                 // return total records, the rows HTML data,
                 // and the headers information.
-                return [data.total, $(data.rows), data.headers];
+                return [data.total, $(data.rows)];
             }
         }
     }
 });
 ```
-For full documentation regarding the usage of tableSorter please go [here](https://mottie.github.io/tablesorter/docs/index.html) for the very popular fork by mottie, or [here](http://tablesorter.com/docs/) for the original version of the plugin.
+That's it! The results fetched from the server are now filtered, sorted and paginated by TableSortable.
 
-Now, the results fetched from the server would be filtered, sorter and paginated by TableSortable.
+For full documentation of the usage of tableSorter.js please go [here](https://mottie.github.io/tablesorter/docs/index.html) for the very popular fork by mottie, or [here](http://tablesorter.com/docs/) for the original version of the plugin.
 
 Of course there are many more configuration options that make TableSortable flexible and adaptable. For those, please see [advanced configuration](#advanced-configuration)
 
