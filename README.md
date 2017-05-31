@@ -8,7 +8,7 @@ combining multiple queries, columns to sort by, or figuring out how to send the 
 
 It is a Rails backend complementation to the frontend tableSorter.js.
 
-#### The Problem
+### The Problem
 The jQuery tableSorter plugin is an excellent tool for filtering and sorting tables. 
 Often, when dealing with lots of rows, we may want to split the table into multiple pages. tableSorter.js has a nifty [widget](https://mottie.github.io/tablesorter/docs/example-pager-ajax.html) for that, which requires using [mottie's fork](https://mottie.github.io/tablesorter/docs/index.html) of tableSorter.
 
@@ -16,7 +16,7 @@ Usually this is a scenario where we don't want to send our entire set of records
 which consequently means that the frontend no longer knows the entire set of records to filter and sort through,
 which eventually requires our *server* to handle all that stuff as well as the pagination of the results.
 
-#### The Solution: TableSortable
+### The Solution: TableSortable
 TableSortable will handle all the backend filtering, sorting and pagination for you.
 
 NOTICE: This gem is in very early stages of development, and is not yet fully documented.  Any input will be more than welcome.
@@ -74,7 +74,6 @@ end
 Let's write the `index` view. We can use TableSortable's [view helpers](#view-helpers) to render our table.
 ```erb
 <!-- views/users/index.html.erb -->
-
 <div id="usersPager">
     <%= table_sortable_pager %>
 </div>
@@ -104,7 +103,6 @@ json.pager_output 'Users {startRow} to {endRow} of {totalRows}'
 We should also create the _user_row.html partial. In it, we may also use TableSortable's [helpers](#view-helpers).
 ```erb
 <!-- views/users/_user_row.html.erb -->
-
 <tr>
     <%= table_sortable_columns user %>
 </tr>

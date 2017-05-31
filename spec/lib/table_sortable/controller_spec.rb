@@ -48,18 +48,6 @@ describe TableSortable::Controller do
     end
   end
 
-  # context 'filter_order' do
-  #   it 'orders sql filters before array filters' do
-  #     expect(controller_with_columns.send(:filter_order)).to eq [:first_name, :email, :last_name]
-  #   end
-  # end
-  #
-  # context 'sort_order' do
-  #   it 'orders sql sorters before array filters' do
-  #     expect(controller_with_columns.send(:sort_order)).to eq [:email, :first_name, :last_name]
-  #   end
-  # end
-
   context 'ordered_actions' do
     it 'orders sql actions before array filters' do
       expect(controller_with_columns.send(:ordered_actions).map{|action| action.method}).to eq [:sql, :sql, :sql, :sql, :array, :array]
