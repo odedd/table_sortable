@@ -4,18 +4,20 @@ module TableSortable
       extend ActiveSupport::Concern
 
       included do
-        attr_reader :proc, :method
+        attr_reader :proc, :method, :column, :type
       end
 
       def initialize(option_name, *options)
         options = options.extract_options!
         unless options[option_name] == false
-          filter = options[option_name] || options[:column_name]
+          @type = option_name
+          @column = options[:column]
+          the_proc = options[option_name] || @column.name if @column
           @method = options["#{option_name.to_s}_method".to_sym] || :array
-          if filter.respond_to? :call
-            @proc = -> (records, col=nil) { instance_exec(records, &filter) }
+          if the_proc.respond_to? :call
+            @proc = proc_wrapper(the_proc)
             @method = detect_method(@proc)
-          elsif !filter.nil?
+          elsif !the_proc.nil?
             case @method
               when :array
                 @proc = array_proc
@@ -27,8 +29,13 @@ module TableSortable
       end
 
       def detect_method(proc)
-        method = [].instance_exec('', &proc) rescue :failed
-        method == :failed ? :sql : :array
+        begin
+          [].instance_exec('', &proc)
+          method = :array
+        rescue NoMethodError
+          method = :sql
+        end
+        method
       end
 
       def disabled?
@@ -43,6 +50,17 @@ module TableSortable
         raise NotImplementedError
       end
 
+      def proc_wrapper(proc)
+        raise NotImplementedError
+      end
+
+      def run(records)
+        raise NotImplementedError
+      end
+
+      def used?
+        raise NotImplementedError
+      end
     end
   end
 end

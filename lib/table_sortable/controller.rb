@@ -36,40 +36,23 @@ module TableSortable
 
     private
 
-    def filter_and_sort(scope)
-      cols = @columns.sort_by(display_order)
-
-      page = params[:page].to_i
-      page_size = params[:pagesize].to_i
-      sort_by_col_data = params[SCOL] ? params[SCOL].keys.first : column_offset
-      sort_order = params[SCOL] ? params[SCOL].values.first : SORT_ASC
-
-      sort_column = cols.at(sort_by_col_data.to_i - column_offset)
-      sort_proc = ->(records) { records.instance_exec(sort_column, &sort_column.sorter.proc)}
-      ordered_sort_proc = ->(records) {sort_order == SORT_ASC ? sort_proc.call(records) : sort_proc.call(records).reverse}
-
-      filters = [->(records) { ordered_sort_proc.call(records) }]
-
-      # a filter exists
-      if params[FCOL]
-        @columns.sort_by(filter_order.reverse).each_with_index do |col, i|
-          column_index = cols.index(col) + column_offset
-          filter_value = params[FCOL][column_index.to_s]
-          filters << ->(records){ filter_value.nil? ? filters[i].call(records) : filters[i].call(records.instance_exec(filter_value, col, &col.filter.proc)) }
-        end
+    def filter_and_sort(scope, params = nil)
+      columns = @columns.sort_by(display_order)
+      @query_params = params.nil? ? QueryParams.new(self.params, columns) : QueryParams.new(params, columns)
+      actions = [->(records) { records }]
+      ordered_actions.reverse.each_with_index do |action, i|
+        actions << ->(records) { action.used? ? actions[i].call(action.run(records)) : actions[i].call(records) }
       end
-      scope = filters.last.call(scope)
-      if page
-        scope = Result.new(scope, page, page_size)
+      scope = actions.last.call(scope)
+      if @query_params.page
+        scope = Result.new(scope, @query_params.page, @query_params.page_size)
       end
       scope
     end
 
     def initialize_table_sortable
-
-      @columns ||= TableSortable::Columns.new
+      @columns = TableSortable::Columns.new
       self.column_offset = 0
-
     end
 
     def columns(record = nil)
@@ -81,7 +64,13 @@ module TableSortable
     end
 
     def sort_order
-      @sort_order || @columns.sort{ |a,b| a.sorter.method && b.sorter.method ? b.sorter.method <=> a.sorter.method : a.filter.method ? 1 : -1 }.compact.map{|col| col.name}
+      @sort_order   || @columns.sort{ |a,b| a.sorter.method && b.sorter.method ? b.sorter.method <=> a.sorter.method : a.sorter.method ? 1 : -1 }.compact.map{|col| col.name}
+    end
+
+    def ordered_actions
+      filter_actions =  @columns.map{|col| col.filter }
+      sort_actions =    @columns.map{|col| col.sorter }
+      (filter_actions+sort_actions).sort{ |a,b| (a.method && b.method) ? (b.method <=> a.method) : a.method ? 1 : -1 }
     end
 
     public

@@ -16,8 +16,8 @@ module TableSortable
       @label = label
       @placeholder = placeholder
       @template = template
-      @filter = TableSortable::Column::Filter.new(options.merge(:column_name => @name) )
-      @sorter = TableSortable::Column::Sorter.new(options.merge(:column_name => @name) )
+      @filter = TableSortable::Column::Filter.new(options.merge(:column => self) )
+      @sorter = TableSortable::Column::Sorter.new(options.merge(:column => self) )
 
     end
 
