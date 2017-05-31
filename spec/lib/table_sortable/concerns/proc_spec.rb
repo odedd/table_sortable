@@ -12,23 +12,27 @@ describe TableSortable::Concerns::Proc do
       def sql_proc
         -> (x) {x * 3}
       end
+
+      def proc_wrapper(proc)
+        proc
+      end
     end
   end
 
   let :dummy_proc do
-    proc_class.new(:proc, proc: dummy_col)
+    proc_class.new(:proc, column: TableSortable::Column.new(:proc), proc: dummy_col)
   end
 
   context 'on initialization' do
     context 'given a proc' do
       it 'should keep it' do
         example_proc = -> (x) { x * 100 }
-        proc = proc_class.new(:proc, proc: example_proc )
+        proc = proc_class.new(:proc, column: TableSortable::Column.new(:proc),proc: example_proc )
         expect(5.instance_eval(&proc.proc)).to eq 500
       end
       context 'it is an sql proc' do
         it 'should detect it as sql' do
-          proc = proc_class.new(:proc, proc: -> (value) { where(name: value) } )
+          proc = proc_class.new(:proc, column: TableSortable::Column.new(:proc), proc: -> (value) { where(name: value) } )
           expect(proc.method).to eq :sql
         end
       end
@@ -51,13 +55,13 @@ describe TableSortable::Concerns::Proc do
         end
         context '== :sql' do
           it 'should replace it with sql_proc' do
-            dummy_proc = proc_class.new(:proc, column_name: :proc, proc_method: :sql)
+            dummy_proc = proc_class.new(:proc, column: TableSortable::Column.new(:proc), proc_method: :sql)
             expect(5.instance_eval(&dummy_proc.proc)).to eq 5.instance_eval(&dummy_proc.sql_proc)
           end
         end
         context '== :array' do
           it 'should replace it with sql_proc' do
-            dummy_proc = proc_class.new(:proc, column_name: :proc, proc_method: :array)
+            dummy_proc = proc_class.new(:proc, column: TableSortable::Column.new(:proc), proc_method: :array)
             expect(5.instance_eval(&dummy_proc.proc)).to eq 5.instance_eval(&dummy_proc.array_proc)
           end
         end

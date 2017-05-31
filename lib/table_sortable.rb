@@ -8,6 +8,8 @@ module TableSortable
   SCOL = 'scol'
   SORT_ASC = '0'
   SORT_DESC = '1'
+  PAGE = 'page'
+  PAGESIZE = 'pagesize'
 
   class Engine < Rails::Engine; end
 
@@ -24,3 +26,4 @@ require 'table_sortable/result'
 require 'table_sortable/columns'
 require 'table_sortable/version'
 require 'table_sortable/controller'
+require 'table_sortable/query_params'

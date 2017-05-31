@@ -1,25 +1,21 @@
 module TableSortable
-  class Columns
+  class Columns < Array
 
     def initialize
-      @columns = []
+      super
     end
 
     def add(col_name, *options)
       options = options.extract_options!
-      @columns << TableSortable::Column.new(col_name, options)
+      self << TableSortable::Column.new(col_name, options)
     end
 
     def sort_by(sort_key)
       if sort_key
-        sort_key.map{|c| @columns.find{|col| (c.is_a?(String) ? (col.label == c) : col.name == c)}}
+        sort_key.map{|c| self.find{|col| (c.is_a?(String) ? (col.label == c) : col.name == c)}}
       else
-        @columns
+        self
       end
-    end
-
-    def sort(&sort_proc)
-      @columns.sort(&sort_proc)
     end
 
   end

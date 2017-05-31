@@ -3,16 +3,30 @@ module TableSortable
     class Sorter
       include TableSortable::Concerns::Proc
 
-      def initialize(*options)
-        super :sort, *options
+      attr_accessor :sort_order
+
+      def initialize(*args)
+        super :sort, *args
       end
 
       def array_proc
-        -> (col=nil) { sort{ |a,b| col.value(a) <=> col.value(b) }}
+        -> (sort_order, col=nil) { sort{ |a,b| col.value(sort_order == :asc ? a : b) <=> col.value(sort_order == :asc ? b : a) } }
       end
 
       def sql_proc
-        -> (col=nil) { order(sorter) }
+        -> (sort_order, col=nil) { order(sorter => sort_order) }
+      end
+
+      def proc_wrapper(proc)
+        -> (sort_order, col=nil) { instance_exec(sort_order , &proc) }
+      end
+
+      def run(records)
+        records.instance_exec(sort_order, column, &proc)
+      end
+
+      def used?
+        !sort_order.nil?
       end
 
     end

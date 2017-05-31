@@ -15,9 +15,23 @@
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 
 require 'table_sortable'
-require 'support/controller_macros'
-require 'support/matchers/have_filters'
-require 'support/shared_stuff'
+require 'factory_girl'
+require 'active_record'
+
+Dir['spec/support/**/*.rb'].each {|f| require f.gsub('spec/', '')}
+# Dir['spec/models/**/*.rb'].each {|f| require f.gsub('spec/', '')}
+# Dir['spec/factories/**/*.rb'].each {|f| require f.gsub('spec/', '')}
+
+ActiveRecord::Base.establish_connection(:adapter => 'sqlite3', :database => ':memory:')
+ActiveRecord::Schema.define do
+  self.verbose = false
+
+  create_table :users, :force => true do |t|
+    t.string :first_name
+    t.string :last_name
+    t.string :email
+  end
+end
 
 RSpec.configure do |config|
 
