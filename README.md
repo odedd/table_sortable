@@ -37,7 +37,7 @@ please see the [jQuery tablesorter plugin for Rails](https://github.com/themilkm
 
 ## Usage
 
-First, we need to setup our controller. Let's say we have our users controller. 
+First, we need to setup our controller. For this example this will be a users controller.  
 Let's `include TableSortable` so that we can use its methods.
 
 ```ruby
@@ -71,10 +71,9 @@ def index
 end
 ```
 
-`index.html` should render the initial table without the rows. They will be later polled via ajax by
-tableSorter.js. We can use TableSortable's [view helpers](#view-helpers) to render our table.
+Let's write the `index` view. We can use TableSortable's [view helpers](#view-helpers) to render our table.
 ```erb
-#views/users/index.html.erb
+<!-- views/users/index.html.erb -->
 
 <div id="usersPager">
     <%= table_sortable_pager %>
@@ -90,7 +89,9 @@ tableSorter.js. We can use TableSortable's [view helpers](#view-helpers) to rend
     </tbody>
 </table>
 ```
-Let's create `index.json.jbuilder` to send the info back to the frontend.
+Notice how `index.html` doesn't render the actual rows. They will later be polled via ajax by tableSorter.js.
+
+Let's create `index.json.jbuilder` to send the users' info back to the frontend.
 ```ruby
 # views/users/index.json.jbuilder
 # Since we only send out the current page of users, 
@@ -102,13 +103,14 @@ json.pager_output 'Users {startRow} to {endRow} of {totalRows}'
 ```
 We should also create the _user_row.html partial. In it, we may also use TableSortable's [helpers](#view-helpers).
 ```erb
-#views/users/_user_row.html.erb
+<!-- views/users/_user_row.html.erb -->
+
 <tr>
     <%= table_sortable_columns user %>
 </tr>
 ```
 
-We're all done configuring the backend - now to the frontend. Here's a simple tableSorter.js configuration example:
+Now that we are done configuring the backend - let's continue to frontend. Here's a simple tableSorter.js configuration example:
 ```javascript
 var table = $('#usersTable');
 table.tablesorter({
