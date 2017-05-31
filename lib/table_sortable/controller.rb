@@ -38,7 +38,7 @@ module TableSortable
 
     def filter_and_sort(scope, params = nil)
       columns = @columns.sort_by(display_order)
-      @query_params = params.nil? ? QueryParams.new(self.params, columns) : QueryParams.new(params, columns)
+      @query_params = params.nil? ? QueryParams.new(self.params, columns, column_offset) : QueryParams.new(params, columns, column_offset)
       actions = [->(records) { records }]
       ordered_actions.reverse.each_with_index do |action, i|
         actions << ->(records) { action.used? ? actions[i].call(action.run(records)) : actions[i].call(records) }
