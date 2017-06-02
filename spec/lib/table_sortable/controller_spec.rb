@@ -15,7 +15,7 @@ describe TableSortable::Controller do
 
     controller.send(:define_column,
                     :last_name,
-                    filter: -> (value) { select{|record| value.downcase.in? record.last_name.downcase }},
+                    filter: -> (value) { select{|record| record.last_name.downcase.include? value.downcase }},
                     sort: -> (sort_order) { sort{ |a,b| (sort_order == :asc ? a : b).last_name <=> (sort_order == :asc ? b : a).last_name }})
 
     controller.send(:define_column,
@@ -50,7 +50,7 @@ describe TableSortable::Controller do
 
   context 'ordered_actions' do
     it 'orders sql actions before array filters' do
-      expect(controller_with_columns.send(:ordered_actions).map{|action| action.method}).to eq [:sql, :sql, :sql, :sql, :array, :array]
+      expect(controller_with_columns.send(:ordered_actions).map{|action| action.method}).to eq [:active_record, :active_record, :active_record, :active_record, :array, :array]
     end
   end
 

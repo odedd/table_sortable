@@ -33,12 +33,12 @@ describe TableSortable::Concerns::Proc do
       context 'it is an sql proc' do
         it 'should detect it as sql' do
           proc = proc_class.new(:proc, column: TableSortable::Column.new(:proc), proc: -> (value) { where(name: value) } )
-          expect(proc.method).to eq :sql
+          expect(proc.method).to eq :active_record
         end
       end
       context 'it is an array proc' do
         it 'should detect it as array' do
-          proc = proc_class.new(:proc, proc: -> (value) { select{|record| record.name == value} } )
+          proc = proc_class.new(:proc, column: dummy_col, proc: -> (value) { select{|record| record.name == value} } )
           expect(proc.method).to eq :array
         end
       end
@@ -53,9 +53,9 @@ describe TableSortable::Concerns::Proc do
             expect(5.instance_eval(&dummy_proc.proc)).to eq 5.instance_eval(&dummy_proc.array_proc)
           end
         end
-        context '== :sql' do
+        context '== :active_record' do
           it 'should replace it with sql_proc' do
-            dummy_proc = proc_class.new(:proc, column: TableSortable::Column.new(:proc), proc_method: :sql)
+            dummy_proc = proc_class.new(:proc, column: TableSortable::Column.new(:proc), proc_method: :active_record)
             expect(5.instance_eval(&dummy_proc.proc)).to eq 5.instance_eval(&dummy_proc.sql_proc)
           end
         end
@@ -73,7 +73,7 @@ describe TableSortable::Concerns::Proc do
     context 'given a proc containing an sql method' do
       it 'should detect it as sql' do
         proc_to_detect = -> (filter_value) { where(name: filter_value) }
-        expect(dummy_proc.detect_method(proc_to_detect)).to eq :sql
+        expect(dummy_proc.detect_method(proc_to_detect)).to eq :active_record
       end
     end
     context 'given a proc containing an array method' do

@@ -14,7 +14,7 @@ module TableSortable
       end
 
       def sql_proc
-        -> (sort_order, col=nil) { order(sorter => sort_order) }
+        -> (sort_order, col=nil) { order(col.name.to_s.underscore => sort_order) }
       end
 
       def proc_wrapper(proc)

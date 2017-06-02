@@ -138,7 +138,112 @@ For full documentation of the usage of tableSorter.js please go [here](https://m
 Of course there are many more configuration options that make TableSortable flexible and adaptable. For those, please see [advanced configuration](#advanced-configuration)
 
 ## Advanced Configuration
-Coming soon...
+
+#### define_column  
+
+TableSortable lets you define the columns one by one with many custom attributes, using the `define_column` method.
+```ruby
+#controllers/users_controller.rb
+class UsersController < ApplicationController
+  include TableSortable
+  
+  define_column :full_name, 
+                 value: -> (user) {"#{user.first_name} #{user.last_name}"}
+  define_column :email
+end
+```
+##### Syntax: `define_column column_name, [arguments])`  
+
+- `column_name` <sub>(required)</sub>  
+    A symbol representing the column_name. Can be anything, but should usually be the same as the column name. 
+- `arguments` <sub>(optional)</sub>  
+    - `value: (symbol|proc)`  
+        <sub>default: same as column name</sub>   
+        Accepts either a symbol representing a method that the record responds to, like an ActiveRecord attribute, 
+        or a proc the returns the record's value. for example:
+        ```ruby
+        define_column :full_name, 
+                      value: -> (user) {"#{user.first_name} #{user.last_name}"}
+        ```
+    - `content: (symbol|proc)`  
+        <sub>default: same as value</sub>   
+        Works the same way as `value`, but allows specifying a different value to be displayed in the table cells.
+        The difference between `value` and `content` is that the former determines the value by which the scope will be filtered and sorted,
+        while the latter only affects the displayed cell contents.
+        ```ruby
+        define_column :full_name, 
+                      value:   -> (user) {"#{user.first_name} #{user.last_name}"},
+                      content: -> (user) {"#{user.last_name}, #{user.first_name}"}
+        ```
+    - `label: (string)`  
+        <sub>default: 'Titleized' version of the column name</sub>   
+        Allows specifying a string to be used as the column label, displayed at the table header.
+    - `placeholder: (string|false)`  
+        <sub>default: same as header</sub>  
+        Allows specifying a string to be used as a placeholder for the column's filter input field.
+        You may also specify `false`, in which case no placeholder will be displayed.
+    - `filter: (proc|false)`  
+        <sub>default: free case-insensitive text search on the column's value</sub>   
+        By default, the column will be searched on according to the value. However, you may specify a proc to perform the search on that column. 
+        The proc itself can contain either ActiveRecord operations (eg. `where`) or array operations (eg. `select`), 
+        and will be passed the current search query when run.
+        ```ruby
+        define_column :full_name, 
+                      filter: ->(query) {where('LOWER(CONCAT(first_name," ", last_name)) LIKE (?)', "%#{query.downcase}%")}
+        ```
+        If no filtering is to be performed on that column you can set it to `false`. When using TableSortable's [view helpers](#view-helpers),
+        this also means that no filter input will be shown on that column.
+    - `filter_method: (:array|:active_record)`  
+        <sub>default: :array</sub>   
+        Determines whether the default filter function relies on an ActiveRecord `where` method or an Array `select` method.  
+        Only applies when no `filter` option has been specified.
+        - `:array` <sub>(default)</sub>  
+            Filter using the `select` method. While being slower, it selects based on the column value, whatever it might be, and so fits every scenario.
+        - `:active_record`  
+            Filter using the `where` method. While being faster, it only applies to cases where the column name matches the database column name. 
+    - `sort: (proc|false)`  
+        <sub>default: sorting based on the column's value</sub>   
+        By default, the record set will be sorted according to the selected column's value. 
+        However, you may specify a proc to perform the sorting when this column is selected as the sort base. 
+        The proc itself can contain either ActiveRecord operations (eg. `order`) or array operations (eg. `sort`), 
+        and will be passed the current sort order as a symbol (`:asc` or `:desc`) when run.
+        ```ruby
+        define_column :full_name, 
+                      sort: -> (sort_order) { sort{ |a,b| (sort_order == :asc ? a : b) <=> (sort_order == :asc ? b : a) } }
+        ```
+        If no sorting is to be performed based on that column you can set it to `false`. When using TableSortable's [view helpers](#view-helpers),
+        this also means that no sorting will be available on the client side on that column as well.
+    - `sort_method: (:array|:active_record)`  
+        <sub>default: :array</sub>   
+        Determines whether the default sort function relies on an ActiveRecord `order` method or an Array `sort` method.  
+        Only applies when no `sort` option has been specified.
+        - `:array` <sub>(default)</sub>  
+            Sort using the `sort` method. While being slower, it sorts based on the column value, whatever it might be, and so fits every scenario.
+        - `:active_record`  
+            Sort using the `order` method. While being faster, it only applies to cases where the column name matches the database column name. 
+    - `template: (string)`  
+        <sub>default: same as column_name</sub>  
+        Allows setting a custom template name to look for when rendering the header or column contents. For more information see [view helpers](#view-helpers).
+
+#### Dynamic Column Definitions
+
+If the column definitions themselves need to be dynamic (eg. if you're using 
+dynamic fields in your model) you can also use `define column` in a `before action` callback like this
+```ruby
+#controllers/users_controller.rb
+  
+  before_action :define_columns
+
+  private
+  
+  def define_columns
+    @user.custom_fields.each do |cf|
+      define_column cf, 
+                    value: -> (user) {user.get_custom_field(cf)}
+    end
+  end
+```
+
 
 ### View Helpers
 Coming soon...

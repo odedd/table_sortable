@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
 
   spec.summary       = 'Use jquery-tablesorter.js with server side filtering, pagination and sorting'
   spec.description   = 'Use jquery-tablesorter.js with server side filtering, pagination and sorting'
-  # spec.homepage      = "TODO: Put your gem's website or public repo URL here."
+  spec.homepage      = 'https://github.com/odedd/table_sortable'
   spec.license       = "MIT"
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
@@ -32,7 +32,9 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "bundler", "~> 1.15"
   spec.add_development_dependency "rake", "~> 10.0"
   spec.add_development_dependency "rspec", "~> 3.4"
-  spec.add_development_dependency "sqlite3"
-  spec.add_development_dependency "factory_girl_rails"
-  spec.add_dependency "rails", '~> 5.1', '>= 5.1.1'
+  spec.add_development_dependency "sqlite3", "~> 1.3"
+  spec.add_development_dependency "factory_girl_rails", "~> 4.8"
+  spec.add_development_dependency "activerecord", '~> 5.1', '>= 5.1.1'
+  spec.add_dependency "railties", '~> 5.1', '>= 5.1.1'
+  # spec.add_dependency "activesupport", '~> 5.1', '>= 5.1.1'
 end

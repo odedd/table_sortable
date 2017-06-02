@@ -34,6 +34,10 @@ module TableSortable
       @columns.add(col_name, options)
     end
 
+    def columns
+      @columns.sort_by(display_order)
+    end
+
     private
 
     def filter_and_sort(scope, params = nil)
@@ -41,7 +45,7 @@ module TableSortable
 
       actions = [->(records) { records }]
       ordered_actions.reverse.each_with_index do |action, i|
-        actions << ->(records) { action.used? ? actions[i].call(action.run(records)) : actions[i].call(records) }
+        actions << ->(records) { action.used? ? (actions[i].call(action.run(records))) : actions[i].call(records) }
       end
       scope = actions.last.call(scope)
       if @query_params.page
@@ -54,10 +58,6 @@ module TableSortable
     def initialize_table_sortable
       @columns = TableSortable::Columns.new
       self.column_offset = 0
-    end
-
-    def columns
-      @columns.sort_by(display_order)
     end
 
     def ordered_actions

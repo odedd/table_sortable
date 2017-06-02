@@ -12,7 +12,7 @@ module TableSortable
         unless options[option_name] == false
           @type = option_name
           @column = options[:column]
-          the_proc = options[option_name] || @column.name if @column
+          the_proc = options[option_name] || @column.name
           @method = options["#{option_name.to_s}_method".to_sym] || :array
           if the_proc.respond_to? :call
             @proc = proc_wrapper(the_proc)
@@ -21,7 +21,7 @@ module TableSortable
             case @method
               when :array
                 @proc = array_proc
-              when :sql
+              when :active_record
                 @proc = sql_proc
             end
           end
@@ -33,7 +33,7 @@ module TableSortable
           [].instance_exec('', &proc)
           method = :array
         rescue NoMethodError
-          method = :sql
+          method = :active_record
         end
         method
       end

@@ -1,6 +1,4 @@
-require 'rails/engine'
 require 'active_support/concern'
-require 'action_controller'
 
 module TableSortable
 
@@ -11,10 +9,9 @@ module TableSortable
   PAGE = 'page'
   PAGESIZE = 'pagesize'
 
-  class Engine < Rails::Engine; end
+  # class Engine < Rails::Engine; end
 
 end
-
 
 class TableSortableError < StandardError; end
 
@@ -27,3 +24,4 @@ require 'table_sortable/columns'
 require 'table_sortable/version'
 require 'table_sortable/controller'
 require 'table_sortable/query_params'
+require 'table_sortable/railtie' if defined?(Rails)

@@ -1,7 +1,7 @@
 shared_examples_for 'proc_class' do |parameter_name|
   include_context 'shared stuff'
 
-  let(:dummy_class) { described_class.new(parameter_name => ->(x) {x}) }
+  let(:dummy_class) { described_class.new(parameter_name => ->(x) {x}, column: dummy_col) }
 
   it 'includes TableSortable::Concerns::Proc' do
     expect(described_class.included_modules).to include TableSortable::Concerns::Proc

@@ -3,10 +3,12 @@ module TableSortable
     class Filter
       include TableSortable::Concerns::Proc
 
-      attr_accessor :query
+      attr_accessor :query, :default_value
 
       def initialize(*args)
-        super :filter, *args
+        options = args.extract_options!
+        @default_value = options[:filter_default]
+        super :filter, options
       end
 
       def array_proc
@@ -14,7 +16,7 @@ module TableSortable
       end
 
       def sql_proc
-        -> (value, col=nil) { where("LOWER(?) LIKE (?)", filter.to_s.underscore, "%#{value.to_s.downcase}%") }
+        -> (value, col=nil) { where("LOWER(#{col.name.to_s.underscore}) LIKE (?)", "%#{value.to_s.downcase}%") }
       end
 
       def proc_wrapper(proc)

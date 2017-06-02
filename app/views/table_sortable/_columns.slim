@@ -1,3 +1,0 @@
-- columns.each do |col|
-  - options = {value: col.value(record), source: record, column: col}
-  = render("#{controller_path}/table_sortable/#{col.template}_field", options) rescue render('table_sortable/field', options)

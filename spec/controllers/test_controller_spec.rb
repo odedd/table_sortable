@@ -1,3 +1,6 @@
+require 'action_controller'
+
+
 module Test
   class Controller < ActionController::Base
 
