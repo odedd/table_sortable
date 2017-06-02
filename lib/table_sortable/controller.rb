@@ -63,7 +63,7 @@ module TableSortable
     def ordered_actions
       filter_actions =  @columns.map{|col| col.filter }
       sort_actions =    @columns.map{|col| col.sorter }
-      (filter_actions+sort_actions).sort{ |a,b| (a.method && b.method) ? (b.method <=> a.method) : a.method ? 1 : -1 }
+      (filter_actions+sort_actions).sort{ |a,b| (a.method && b.method) ? (a.method <=> b.method) : b.method ? 1 : -1 }
     end
 
     def populate_params(params = nil)
