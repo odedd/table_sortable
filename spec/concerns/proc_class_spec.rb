@@ -8,7 +8,7 @@ shared_examples_for 'proc_class' do |parameter_name|
   end
   it 'defines methods of its own' do
     expect(dummy_class.array_proc).to respond_to :call
-    expect(dummy_class.sql_proc).to respond_to :call
+    expect(dummy_class.active_record_proc).to respond_to :call
     expect(dummy_class.send(:proc_wrapper, -> {x})).to respond_to :call
     expect(dummy_class).to respond_to :run
     expect(dummy_class).to respond_to :used?

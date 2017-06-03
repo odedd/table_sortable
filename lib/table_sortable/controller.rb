@@ -28,15 +28,15 @@ module TableSortable
         end
       end
 
-      def column_order(order)
+      def define_column_order(order)
         before_action do
-          column_order order
+          define_column_order order
         end
       end
 
-      def column_offset(offset)
+      def define_column_offset(offset)
         before_action do
-          column_offset offset
+          define_column_offset offset
         end
       end
     end
@@ -44,6 +44,14 @@ module TableSortable
     def define_column(col_name, *options)
       options = options.extract_options!
       @columns.add(col_name, options)
+    end
+
+    def define_column_order(*order)
+      @column_order = order
+    end
+
+    def define_column_offset(offset)
+      @column_offset = offset
     end
 
     def columns
@@ -56,7 +64,7 @@ module TableSortable
       populate_params(params)
 
       actions = [->(records) { records }]
-      ordered_actions.reverse.each_with_index do |action, i|
+      ordered_actions(scope.first).reverse.each_with_index do |action, i|
         actions << ->(records) { action.used? ? (actions[i].call(action.run(records))) : actions[i].call(records) }
       end
       scope = actions.last.call(scope)
@@ -72,22 +80,14 @@ module TableSortable
       define_column_offset 0
     end
 
-    def ordered_actions
+    def ordered_actions(record = nil)
       filter_actions =  @columns.map{|col| col.filter }
       sort_actions =    @columns.map{|col| col.sorter }
-      (filter_actions+sort_actions).sort{ |a,b| (a.method && b.method) ? (a.method <=> b.method) : b.method ? 1 : -1 }
+      (filter_actions+sort_actions).sort{ |a,b| (a.method(record) && b.method(record)) ? (a.method(record) <=> b.method(record)) : b.method(record) ? 1 : -1 }
     end
 
     def populate_params(params = nil)
       @query_params = QueryParams.new(params || self.params, columns, column_offset)
-    end
-
-    def define_column_order(*order)
-      @column_order = order
-    end
-
-    def define_column_offset(offset)
-      @column_offset = offset
     end
 
     public

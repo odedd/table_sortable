@@ -4,7 +4,7 @@ module TableSortable
       extend ActiveSupport::Concern
 
       included do
-        attr_reader :proc, :method, :column, :type
+        attr_reader :proc, :column, :type
       end
 
       def initialize(option_name, *options)
@@ -13,7 +13,7 @@ module TableSortable
           @type = option_name
           @column = options[:column]
           the_proc = options[option_name] || @column.name
-          @method = options["#{option_name.to_s}_method".to_sym] || :array
+          @method = options["#{option_name.to_s}_method".to_sym] || :autodetect
           if the_proc.respond_to? :call
             @proc = proc_wrapper(the_proc)
             @method = detect_method(@proc)
@@ -22,18 +22,34 @@ module TableSortable
               when :array
                 @proc = array_proc
               when :active_record
-                @proc = sql_proc
+                @proc = active_record_proc
             end
           end
         end
       end
 
-      def detect_method(proc)
+      def detect_method(proc, scope = nil)
         begin
           [].instance_exec('', &proc)
           method = :array
         rescue NoMethodError
           method = :active_record
+        end
+        method
+      end
+
+      def method(record = nil)
+        return @method if record.nil?
+        if @method == :autodetect
+          if record.class.columns.map{|col| col.name.to_sym}.include? @column.name
+            method = :active_record
+            @proc = active_record_proc
+          else
+            method = :array
+            @proc = array_proc
+          end
+        else
+          method = @method
         end
         method
       end
@@ -46,7 +62,7 @@ module TableSortable
         raise NotImplementedError
       end
 
-      def sql_proc
+      def active_record_proc
         raise NotImplementedError
       end
 

@@ -13,7 +13,7 @@ module TableSortable
         -> (sort_order, col=nil) { sort{ |a,b| col.value(sort_order == :asc ? a : b) <=> col.value(sort_order == :asc ? b : a) } }
       end
 
-      def sql_proc
+      def active_record_proc
         -> (sort_order, col=nil) { order(col.name.to_s.underscore => sort_order) }
       end
 

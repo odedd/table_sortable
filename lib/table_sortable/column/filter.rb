@@ -12,10 +12,10 @@ module TableSortable
       end
 
       def array_proc
-        -> (value, col=nil) { select{|record| value.downcase.in? col.value(record).to_s.downcase} }
+        -> (value, col=nil) { select{|record| col.value(record).to_s.downcase.include? value.downcase} }
       end
 
-      def sql_proc
+      def active_record_proc
         -> (value, col=nil) { where("LOWER(#{col.name.to_s.underscore}) LIKE (?)", "%#{value.to_s.downcase}%") }
       end
 

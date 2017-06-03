@@ -9,7 +9,7 @@ describe TableSortable::Concerns::Proc do
         -> (x) {x * 2}
       end
 
-      def sql_proc
+      def active_record_proc
         -> (x) {x * 3}
       end
 
@@ -44,23 +44,18 @@ describe TableSortable::Concerns::Proc do
       end
     end
     context 'given no proc' do
-      it 'should use array proc' do
-        expect(dummy_proc.method).to eq :array
+      it 'should set method to autodetect' do
+        expect(dummy_proc.method).to eq :autodetect
       end
       context '_method: option' do
-        context 'not provided' do
-          it 'should replace it with array_proc' do
-            expect(5.instance_eval(&dummy_proc.proc)).to eq 5.instance_eval(&dummy_proc.array_proc)
-          end
-        end
         context '== :active_record' do
-          it 'should replace it with sql_proc' do
+          it 'should replace it with active_record_proc' do
             dummy_proc = proc_class.new(:proc, column: TableSortable::Column.new(:proc), proc_method: :active_record)
-            expect(5.instance_eval(&dummy_proc.proc)).to eq 5.instance_eval(&dummy_proc.sql_proc)
+            expect(5.instance_eval(&dummy_proc.proc)).to eq 5.instance_eval(&dummy_proc.active_record_proc)
           end
         end
         context '== :array' do
-          it 'should replace it with sql_proc' do
+          it 'should replace it with active_record_proc' do
             dummy_proc = proc_class.new(:proc, column: TableSortable::Column.new(:proc), proc_method: :array)
             expect(5.instance_eval(&dummy_proc.proc)).to eq 5.instance_eval(&dummy_proc.array_proc)
           end

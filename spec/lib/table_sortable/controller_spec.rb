@@ -6,23 +6,22 @@ describe TableSortable::Controller do
     controller.instance_eval('initialize_table_sortable')
     controller
   end
+
   let :controller_with_columns do
-
     controller.send(:define_column,
-                    :first_name,
-                    filter: -> (value) { where('UPPER(first_name) LIKE (?)', "%#{value.upcase}%") },
-                    sort: -> (sort_order) { order(:first_name => sort_order) })
-
+                    :first_name)#,
+                    # filter: -> (value) { where('UPPER(first_name) LIKE (?)', "%#{value.upcase}%") },
+                    # sort: -> (sort_order) { order(:first_name => sort_order) })
     controller.send(:define_column,
                     :last_name,
                     filter: -> (value) { select{|record| record.last_name.downcase.include? value.downcase }},
                     sort: -> (sort_order) { sort{ |a,b| (sort_order == :asc ? a : b).last_name <=> (sort_order == :asc ? b : a).last_name }})
-
+    controller.send(:define_column,
+                    :full_name)
     controller.send(:define_column,
                     :email,
                     filter: -> (value) { where('UPPER(email) LIKE (?)', "%#{value.upcase}%") },
                     sort: -> (sort_order) { order(:email => sort_order) })
-
     controller
   end
 
@@ -50,7 +49,7 @@ describe TableSortable::Controller do
 
   context 'ordered_actions' do
     it 'orders sql actions before array filters' do
-      expect(controller_with_columns.send(:ordered_actions).map{|action| action.method}).to eq [:active_record, :active_record, :active_record, :active_record, :array, :array]
+      expect(controller_with_columns.send(:ordered_actions).map{|action| action.method}).to eq [:active_record, :active_record, :array, :array, :autodetect, :autodetect, :autodetect, :autodetect]
     end
   end
 
@@ -67,7 +66,7 @@ describe TableSortable::Controller do
       sort_by_first_name = controller_with_columns.send(:filter_and_sort, User.all, {TableSortable::PAGESIZE => '10', TableSortable::PAGE => '0', TableSortable::SCOL => {'0' => TableSortable::SORT_ASC}})
       expect(sort_by_first_name.pluck(:first_name)).to eq %w(Aaron Bob David Jim)
 
-      sort_by_email = controller_with_columns.send(:filter_and_sort, User.all, {TableSortable::PAGESIZE => '10', TableSortable::PAGE => '0', TableSortable::SCOL => {'2' => TableSortable::SORT_ASC}})
+      sort_by_email = controller_with_columns.send(:filter_and_sort, User.all, {TableSortable::PAGESIZE => '10', TableSortable::PAGE => '0', TableSortable::SCOL => {'3' => TableSortable::SORT_ASC}})
       expect(sort_by_email.pluck(:first_name)).to eq %w(Jim David Bob Aaron)
     end
     context "sort order parameter equals #{TableSortable::SORT_DESC}" do
@@ -76,6 +75,8 @@ describe TableSortable::Controller do
         expect(sort_by_last_name_desc.pluck(:first_name)).to eq %w(Aaron Jim Bob David)
       end
     end
+    it 'detects whether to use an active_record or array filter' do
 
+    end
   end
 end

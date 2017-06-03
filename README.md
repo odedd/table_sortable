@@ -200,8 +200,10 @@ end
         If no filtering is to be performed on that column you can set it to `false`. When using TableSortable's [view helpers](#view-helpers),
         this also means that no filter input will be shown on that column.
     - `filter_method: (:array|:active_record)`  
-        <sub>default: :array</sub>   
+        <sub>default: automatically detects method based on the record given</sub>   
         Determines whether the default filter function relies on an ActiveRecord `where` method or an Array `select` method.  
+        When no method and no filters are supplied, TableSortable will check if the column_name corresponds to a database column of the record. 
+        If it does, it will use an ActiveRecord `where` method, otherwise it will perform an array `select` operation.  
         _Only applies when no `filter` option has been specified._
         - `:array` <sub>(default)</sub>  
             Filter using the `select` method. While being slower, it selects based on the column's value, whatever it might be, and so fits every scenario.
@@ -225,6 +227,8 @@ end
     - `sort_method: (:array|:active_record)`  
         <sub>default: :array</sub>   
         Determines whether the default sort function relies on an ActiveRecord `order` method or an Array `sort` method.  
+        When no method and no filters are supplied, TableSortable will check if the column_name corresponds to a database column of the record. 
+        If it does, it will use an ActiveRecord `order` method, otherwise it will perform an array `sort` operation.  
         _Only applies when no `sort` option has been specified._
         - `:array` <sub>(default)</sub>  
             Sort using the `sort` method. While being slower, it sorts based on the column's value, whatever it might be, and so fits every scenario.
@@ -339,6 +343,8 @@ Here is an example of a full name header partial, which includes a font-awesome 
 
 By using the template attribute you may render several columns using the same template.
 
+_Notice that whether using slim or erb, you must include .html before the extension._
+
 #### table_sortable_columns
 ##### Syntax: `table_sortable_columns record, [html_attributes]`  
 Renders the table columns for a specific `record`, each one inside a \<td> tag.  
@@ -371,6 +377,8 @@ Here is an example of a full name column partial, in which the name links to the
 </td>
 ```
 By using the template attribute you may render several columns using the same template.
+
+_Notice that whether using slim, haml or erb, you must include .html before the extension._
 
 #### table_sortable_pager
 documentation coming soon...
