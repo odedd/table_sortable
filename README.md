@@ -306,7 +306,7 @@ TableSortable offers several view helpers, to help maintain the connection betwe
 #### table_sortable_headers
 ##### Syntax: `table_sortable_headers [html_attributes]`  
 Renders the table header columns, each one inside a \<th> tag.  
-Notice that it _does not_ wrap a \<tr> tag around the headers, to allow you adding columns before of after TableSortable's headers. 
+Notice that it _does not_ wrap a \<tr> tag around the headers, allowing you to add columns before of after TableSortable's headers. 
 
 It also renders data attributes that let tableSorter.js know the columns behaviour:
 - `data-filter="false"` if the column's `filter` attribute is set to `false`.
@@ -342,7 +342,7 @@ By using the template attribute you may render several columns using the same te
 #### table_sortable_columns
 ##### Syntax: `table_sortable_columns record, [html_attributes]`  
 Renders the table columns for a specific `record`, each one inside a \<td> tag.  
-Notice that it _does not_ wrap a \<tr> tag around the headers, to allow you adding columns before of after TableSortable's columns. 
+Notice that it _does not_ wrap a \<tr> tag around the headers, allowing you to add columns before of after TableSortable's columns. 
 
 It also renders data attributes that let tableSorter.js know the columns behaviour:
 - `data-text="?"` if the column's `value` attribute is different than the column's `content` attribute, the value will be set in the `data-text` attribute, and the content will be displayed inside the \<td> element.
@@ -367,11 +367,13 @@ Here is an example of a full name column partial, in which the name links to the
 ```erb
 <!-- views/users/table_sortable/_full_name_column.html.erb -->
 <td> 
-    <%= link_to content, edit_user_path(@user) %> 
+    <%= link_to content, edit_user_path(source) %> 
 </td>
 ```
-
 By using the template attribute you may render several columns using the same template.
+
+#### table_sortable_pager
+documentation coming soon...
 
 ## Development
 
