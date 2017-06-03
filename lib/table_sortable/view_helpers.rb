@@ -51,8 +51,9 @@ module TableSortable
         td_options.merge!(html_options)
 
         begin
-          render partial: "#{controller_path}/table_sortable/#{col.template}_content.html",
-                 locals: {value: col.content(record),
+          render partial: "#{controller_path}/table_sortable/#{col.template}_column.html",
+                 locals: {content: col.content(record),
+                          value: col.value(record),
                           source: record,
                           column: col}
         rescue ActionView::MissingTemplate

@@ -7,7 +7,7 @@ module TableSortable
 
       def initialize(*args)
         options = args.extract_options!
-        @default_value = options[:filter_default]
+        @default_value = options[:filter_initial_value]
         super :filter, options
       end
 

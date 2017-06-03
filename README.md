@@ -135,9 +135,15 @@ That's it! The results fetched from the server are now filtered, sorted and pagi
 
 For full documentation of the usage of tableSorter.js please go [here](https://mottie.github.io/tablesorter/docs/index.html) for the very popular fork by mottie, or [here](http://tablesorter.com/docs/) for the original version of the plugin.
 
-Of course there are many more configuration options that make TableSortable flexible and adaptable. For those, please see [advanced configuration](#advanced-configuration)
+Of course there are many more configuration options that make TableSortable flexible and adaptable. For those, please see [advanced configuration](#advanced-configuration).
 
 ## Advanced Configuration
+
+TableSortable has several advanced configuration settings, which allow for a more fine-grained control over its behaviour.
+
+- [define_column](#define_column)
+- [define_column_order](#define_column_order)
+- [define_column_offset](#define_column_offset)
 
 #### define_column  
 
@@ -152,7 +158,7 @@ class UsersController < ApplicationController
   define_column :email
 end
 ```
-##### Syntax: `define_column column_name, [arguments])`  
+##### Syntax: `define_column column_name, [arguments]`  
 
 - `column_name` <sub>(required)</sub>  
     A symbol representing the column_name. Can be anything, but should usually be the same as the column name. 
@@ -179,14 +185,14 @@ end
         <sub>default: 'Titleized' version of the column name</sub>   
         Allows specifying a string to be used as the column label, displayed at the table header.
     - `placeholder: (string|false)`  
-        <sub>default: same as header</sub>  
+        <sub>default: same as label</sub>  
         Allows specifying a string to be used as a placeholder for the column's filter input field.
         You may also specify `false`, in which case no placeholder will be displayed.
     - `filter: (proc|false)`  
         <sub>default: free case-insensitive text search on the column's value</sub>   
-        By default, the column will be searched on according to the value. However, you may specify a proc to perform the search on that column. 
+        By default, the column will be filtered according to the column's value. However, you may specify a proc to perform the search on that column. 
         The proc itself can contain either ActiveRecord operations (eg. `where`) or array operations (eg. `select`), 
-        and will be passed the current search query when run.
+        and will be passed the current filter query when run.
         ```ruby
         define_column :full_name, 
                       filter: ->(query) {where('LOWER(CONCAT(first_name," ", last_name)) LIKE (?)', "%#{query.downcase}%")}
@@ -196,11 +202,14 @@ end
     - `filter_method: (:array|:active_record)`  
         <sub>default: :array</sub>   
         Determines whether the default filter function relies on an ActiveRecord `where` method or an Array `select` method.  
-        Only applies when no `filter` option has been specified.
+        _Only applies when no `filter` option has been specified._
         - `:array` <sub>(default)</sub>  
-            Filter using the `select` method. While being slower, it selects based on the column value, whatever it might be, and so fits every scenario.
+            Filter using the `select` method. While being slower, it selects based on the column's value, whatever it might be, and so fits every scenario.
         - `:active_record`  
             Filter using the `where` method. While being faster, it only applies to cases where the column name matches the database column name. 
+    - `filter_initial_value: (string)`
+        <sub>default: nil</sub>   
+        You may specify an initial filter query for each column.
     - `sort: (proc|false)`  
         <sub>default: sorting based on the column's value</sub>   
         By default, the record set will be sorted according to the selected column's value. 
@@ -212,20 +221,20 @@ end
                       sort: -> (sort_order) { sort{ |a,b| (sort_order == :asc ? a : b) <=> (sort_order == :asc ? b : a) } }
         ```
         If no sorting is to be performed based on that column you can set it to `false`. When using TableSortable's [view helpers](#view-helpers),
-        this also means that no sorting will be available on the client side on that column as well.
+        this also means that no sorting handle will be shown on the client side on that column as well.
     - `sort_method: (:array|:active_record)`  
         <sub>default: :array</sub>   
         Determines whether the default sort function relies on an ActiveRecord `order` method or an Array `sort` method.  
-        Only applies when no `sort` option has been specified.
+        _Only applies when no `sort` option has been specified._
         - `:array` <sub>(default)</sub>  
-            Sort using the `sort` method. While being slower, it sorts based on the column value, whatever it might be, and so fits every scenario.
+            Sort using the `sort` method. While being slower, it sorts based on the column's value, whatever it might be, and so fits every scenario.
         - `:active_record`  
             Sort using the `order` method. While being faster, it only applies to cases where the column name matches the database column name. 
     - `template: (string)`  
         <sub>default: same as column_name</sub>  
         Allows setting a custom template name to look for when rendering the header or column contents. For more information see [view helpers](#view-helpers).
 
-#### Dynamic Column Definitions
+##### Dynamic Column Definitions
 
 If the column definitions themselves need to be dynamic (eg. if you're using 
 dynamic fields in your model) you can also use `define column` in a `before action` callback like this
@@ -244,9 +253,125 @@ dynamic fields in your model) you can also use `define column` in a `before acti
   end
 ```
 
+#### define_column_order  
+Columns are displayed in the order they are defined using `define_method`. If you wish, you may override this order by specifying your own using the `define_column_order` method.  
+It also allows hiding columns that you need to include in the filtering and sorting process, eg. when you want to have an external search box filtering based on a column that you don't necessarily want to display.
+##### Syntax: `define_column_order column1, [column2], [column3] ...`  
+```ruby
+#controllers/users_controller.rb
+#define a full_name column, allowing to create a custom search box that operates on the 4th column
+define_columns :first_name, :last_name, :email, :full_name
+define_column_order :last_name, :first_name, :email
+```
+#### define_column_offset  
+Sometimes you wish to manually add columns in the views before adding the defined TableSortable columns, eg. to have a checkbox next to each row.  
+```erb
+<!-- views/users/index.html.erb -->
+<table id="usersTable" data-query="<%= users_path %>">
+    <thead>
+        <tr></tr>   <!-- EXTRA COLUMN -->
+        <tr>
+            <%= table_sortable_headers %>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+<!-- views/users/_user_row.html.erb -->
+<tr> <%= check_box_tag :checked %> </tr>   <!-- EXTRA COLUMN -->
+<tr>
+    <%= table_sortable_columns user %>
+</tr>
+```
+Since the column numbers that appear in tableSorter.js' ajax request will represent their actual number, you should let TableSortable know that the columns you defined are offset.  
+So, in the above case you should define an offset of 1.
+
+##### Syntax: `define_column_offset offset`  
+```ruby
+define_column_offset 1
+```
+You may define it either using the `define_column_offset` method shown above, 
+or using the all inclusive `define_columns` method, as an `offset: <integer>` argument.
+```ruby
+define_column :first_name, :last_name, :email, offset: 1
+```
 
 ### View Helpers
-Coming soon...
+TableSortable offers several view helpers, to help maintain the connection between the view layer and the controller layer, and make your code DRYer and less error prone.
+- [table_sortable_headers](#table_sortable_headers)
+- [table_sortable_columns](#table_sortable_columns)
+- [table_sortable_pager](#table_sortable_pager)
+
+#### table_sortable_headers
+##### Syntax: `table_sortable_headers [html_attributes]`  
+Renders the table header columns, each one inside a \<th> tag.  
+Notice that it _does not_ wrap a \<tr> tag around the headers, to allow you adding columns before of after TableSortable's headers. 
+
+It also renders data attributes that let tableSorter.js know the columns behaviour:
+- `data-filter="false"` if the column's `filter` attribute is set to `false`.
+- `data-sorter="false"` if the column's `sort` attribute is set to `false`.
+- `data-placeholder="?"` if a placeholder has been defined (defaults to be the same as the column's label).
+- `data-value="?"` if an initial filter value has been defined.
+
+You may also specify any html attribute, as well as additional data attributes to be added to each \<th> element.
+```erb
+<tr> <%= table_sortable_headers class: 'text-center' %> </tr>
+```
+
+If you wish to render your own version of a specific header (eg. to add an icon), 
+you may create a partial inside a `table_sortable` folder nested inside the controller's views folder. The partial should be named according to the following naming scheme:  
+`_<template>_header.html`, with `template` corresponding to the column's template attribute.  
+Notice that in this case you need to manually specify the different data attributes that correspond to the behaviour you wish this column to have.
+
+The view will be supplied with two locals:
+- `label`: the column's label
+- `column`: the TableSortable::Column object
+
+Here is an example of a full name header partial, which includes a font-awesome icon:
+```erb
+<!-- views/users/table_sortable/_full_name_header.html.erb -->
+<th data-placeholder="<%= column.placeholder %>"> 
+    <i class="fa fa-user" aria-hidden="true"></i>
+    <%= label %> 
+</th>
+```
+
+By using the template attribute you may render several columns using the same template.
+
+#### table_sortable_columns
+##### Syntax: `table_sortable_columns record, [html_attributes]`  
+Renders the table columns for a specific `record`, each one inside a \<td> tag.  
+Notice that it _does not_ wrap a \<tr> tag around the headers, to allow you adding columns before of after TableSortable's columns. 
+
+It also renders data attributes that let tableSorter.js know the columns behaviour:
+- `data-text="?"` if the column's `value` attribute is different than the column's `content` attribute, the value will be set in the `data-text` attribute, and the content will be displayed inside the \<td> element.
+
+You may also specify any html attribute, as well as additional data attributes to be added to each \<td> element.
+```erb
+<tr> <%= table_sortable_columns @user, class: 'text-info' %> </tr>
+```
+
+If you wish to render your own version of a specific column (eg. to include a link inside of it), 
+you may create a partial inside a `table_sortable` folder nested inside the controller's views folder. The partial should be named according to the following naming scheme:  
+`_<template>_column.html`, with `template` corresponding to the column's template attribute.  
+Notice that in this case you need to manually specify the different data attributes that correspond to the behaviour you wish this column to have.
+
+The view will be supplied with four locals:
+- `source`: the source ActiveRecord object
+- `content`: the column's content to be displayed
+- `value`: the column's value
+- `column`: the TableSortable::Column object
+
+Here is an example of a full name column partial, in which the name links to the edit_user_path:
+```erb
+<!-- views/users/table_sortable/_full_name_column.html.erb -->
+<td> 
+    <%= link_to content, edit_user_path(@user) %> 
+</td>
+```
+
+By using the template attribute you may render several columns using the same template.
 
 ## Development
 

@@ -18,13 +18,25 @@ module TableSortable
           columns.each do |column|
             define_column column
           end
-          self.column_offset = column_offset
+          define_column_offset column_offset
         end
       end
 
       def define_column(*args)
         before_action do
           define_column *args
+        end
+      end
+
+      def column_order(order)
+        before_action do
+          column_order order
+        end
+      end
+
+      def column_offset(offset)
+        before_action do
+          column_offset offset
         end
       end
     end
@@ -35,7 +47,7 @@ module TableSortable
     end
 
     def columns
-      @columns.sort_by(display_order)
+      @columns.sort_by(column_order)
     end
 
     private
@@ -57,7 +69,7 @@ module TableSortable
 
     def initialize_table_sortable
       @columns = TableSortable::Columns.new
-      self.column_offset = 0
+      define_column_offset 0
     end
 
     def ordered_actions
@@ -70,10 +82,17 @@ module TableSortable
       @query_params = QueryParams.new(params || self.params, columns, column_offset)
     end
 
+    def define_column_order(*order)
+      @column_order = order
+    end
+
+    def define_column_offset(offset)
+      @column_offset = offset
+    end
+
     public
 
-    attr_writer :filter_order, :sort_order
-    attr_accessor :display_order, :column_offset
+    attr_reader :column_order, :column_offset
 
   end
 end
