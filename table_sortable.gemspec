@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["davidovoded@gmail.com"]
 
   spec.summary       = 'Use jquery-tablesorter.js with server side filtering, pagination and sorting'
-  spec.description   = 'Use jquery-tablesorter.js with server side filtering, pagination and sorting'
+  spec.description   = "TableSortable adds multi-column, server-side filtering, sorting and pagination to the tableSorter jQuery plugin, so you don't have to worry about interpreting the query parameters, combining multiple queries, columns to sort by, or figuring out how to send the correct page back to the client. It is a Rails backend complementation to the frontend tableSorter.js."
   spec.homepage      = 'https://github.com/odedd/table_sortable'
   spec.license       = "MIT"
 
