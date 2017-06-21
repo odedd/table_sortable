@@ -38,19 +38,19 @@ please see the [jQuery tablesorter plugin for Rails](https://github.com/themilkm
 ## Usage
 
 First, we need to setup our controller. For this example this will be a users controller.  
-Let's `include TableSortable` so that we can use its methods.
+Let's `include TableSortable::Controller` so that we can use its methods.
 
 ```ruby
 #controllers/users_controller.rb
 class UsersController < ApplicationController
-  include TableSortable
+  include TableSortable::Controller
 ```
 
 Next, let's define our columns.
 ```ruby
 #controllers/users_controller.rb
 class UsersController < ApplicationController
-  include TableSortable
+  include TableSortable::Controller
   
   define_colunns :first_name, :last_name, :email, :created_at
 ```
@@ -151,7 +151,7 @@ TableSortable lets you define the columns one by one with many custom attributes
 ```ruby
 #controllers/users_controller.rb
 class UsersController < ApplicationController
-  include TableSortable
+  include TableSortable::Controller
   
   define_column :full_name, 
                  value: -> (user) {"#{user.first_name} #{user.last_name}"}
