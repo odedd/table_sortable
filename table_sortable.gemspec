@@ -36,5 +36,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "factory_girl_rails", "~> 4.8"
   spec.add_development_dependency "activerecord", '>= 4.1.0', '< 5.2'
   spec.add_dependency "railties", '>= 4.1.0', '< 5.2'
+  spec.add_dependency "i18n", '~> 0.7'
+
   # spec.add_dependency "activesupport", '~> 5.1', '>= 5.1.1'
 end
