@@ -1,14 +1,15 @@
 module TableSortable
   class Column
 
-    attr_reader :name, :label, :filter, :sorter, :template, :placeholder, :content#, :sort_priority
+    attr_reader :name, :label, :filter, :sorter, :template, :placeholder, :content, :translation_key
 
     def initialize(col_name, *options)
 
       options = options.extract_options!
       value = options[:value] || col_name
       content = options[:content] || value
-      label = options[:label] || (options[:label] == false ? '' : col_name.to_s.titleize)
+      translation_key = options[:translation_key]
+      label = options[:label] || (options[:label] == false ? '' : I18n.translate("table_sortable.#{"#{translation_key}." if translation_key }#{col_name.to_s}", :default => col_name.to_s).titleize)
       placeholder = options[:placeholder] || (options[:placeholder] == false ? nil : label)
       # priority = options[:priority]
       template = options[:template] || col_name

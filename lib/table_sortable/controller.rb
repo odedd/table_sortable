@@ -13,12 +13,14 @@ module TableSortable
       def define_columns(*args)
         options = args.extract_options!
         column_offset = options[:offset] || 0
+        translation_key = options[:translation_key]
         columns   = args
         before_action(options) do
-          columns.each do |column|
-            define_column column
-          end
+          define_translation_key translation_key
           define_column_offset column_offset
+          columns.each do |column|
+            define_column column, translation_key: translation_key
+          end
         end
       end
 
@@ -39,10 +41,16 @@ module TableSortable
           define_column_offset offset
         end
       end
+
+      def define_translation_key(key)
+        before_action do
+          define_translation_key key
+        end
+      end
     end
 
     def define_column(col_name, *options)
-      options = options.extract_options!
+      options = default_column_options.merge(options.extract_options!)
       @columns.add(col_name, options)
     end
 
@@ -54,11 +62,19 @@ module TableSortable
       @column_offset = offset
     end
 
+    def define_translation_key(key)
+      @translation_key = key
+    end
+
     def columns
       @columns.sort_by(column_order)
     end
 
     private
+
+    def default_column_options
+      {translation_key: @translation_key}
+    end
 
     def filter_and_sort(scope, params = nil)
       populate_params(params)
@@ -92,7 +108,7 @@ module TableSortable
 
     public
 
-    attr_reader :column_order, :column_offset
+    attr_reader :column_order, :column_offset, :translation_key
 
   end
 end
