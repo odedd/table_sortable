@@ -83,7 +83,7 @@ module TableSortable
       ordered_actions(scope.first).reverse.each_with_index do |action, i|
         actions << ->(records) { action.used? ? (actions[i].call(action.run(records))) : actions[i].call(records) }
       end
-      scope = actions.last.call(scope)
+      scope = actions.last.call(scope) unless scope.blank?
       if @query_params.page
         scope = Result.new(scope, @query_params.page, @query_params.page_size)
       end
