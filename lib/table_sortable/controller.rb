@@ -11,16 +11,9 @@ module TableSortable
 
     module ClassMethods
       def define_columns(*args)
-        options = args.extract_options!
-        column_offset = options[:offset] || 0
-        translation_key = options[:translation_key]
-        columns   = args
+
         before_action(options) do
-          define_translation_key translation_key
-          define_column_offset column_offset
-          columns.each do |column|
-            define_column column, translation_key: translation_key
-          end
+          define_columns(args)
         end
       end
 
@@ -47,6 +40,26 @@ module TableSortable
           define_translation_key key
         end
       end
+
+      def define_template_path(path)
+        before_action do
+          define_template_path path
+        end
+      end
+    end
+
+    def define_columns(*args)
+      options = args.extract_options!
+      column_offset = options[:offset] || 0
+      translation_key = options[:translation_key]
+      template_path = options[:template_path]
+      columns   = args
+      define_translation_key translation_key
+      define_template_path template_path
+      define_column_offset column_offset
+      columns.each do |column|
+        define_column column, translation_key: translation_key
+      end
     end
 
     def define_column(col_name, *options)
@@ -66,6 +79,10 @@ module TableSortable
       @translation_key = key
     end
 
+    def define_template_path(path)
+      @template_path = path.blank? ? nil : File.join(path, "")
+    end
+
     def columns
       @columns.sort_by(column_order)
     end
@@ -73,7 +90,7 @@ module TableSortable
     private
 
     def default_column_options
-      {translation_key: @translation_key}
+      {translation_key: @translation_key, template_path: @template_path}
     end
 
     def filter_and_sort(scope, params = nil)
@@ -108,7 +125,7 @@ module TableSortable
 
     public
 
-    attr_reader :column_order, :column_offset, :translation_key
+    attr_reader :column_order, :column_offset, :translation_key, :template_path
 
   end
 end
