@@ -182,7 +182,7 @@ end
                       content: -> (user) {"#{user.last_name}, #{user.first_name}"}
         ```
     - `label: (string)`  
-        <sub>default: 'Titleized' version of the column name</sub>   
+        <sub>default: 'Titleized' version of the column name. Supports I18n internationalization. see [translateion_key](#translation-key).</sub>   
         Allows specifying a string to be used as the column label, displayed at the table header.
     - `placeholder: (string|false)`  
         <sub>default: same as label</sub>  
@@ -331,6 +331,7 @@ Notice that in this case you need to manually specify the different data attribu
 The view will be supplied with two locals:
 - `label`: the column's label
 - `column`: the TableSortable::Column object
+- `index`: the column's index (useful for manually setting the `data-col` attribute)
 
 Here is an example of a full name header partial, which includes a font-awesome icon:
 ```erb
@@ -368,6 +369,7 @@ The view will be supplied with four locals:
 - `content`: the column's content to be displayed
 - `value`: the column's value
 - `column`: the TableSortable::Column object
+- `index`: the column's index (useful for manually setting the `data-col` attribute)
 
 Here is an example of a full name column partial, in which the name links to the edit_user_path:
 ```erb
