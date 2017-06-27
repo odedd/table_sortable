@@ -1,7 +1,7 @@
 module TableSortable
   class Column
 
-    attr_reader :name, :label, :filter, :sorter, :template, :placeholder, :content, :translation_key
+    attr_reader :name, :label, :filter, :sorter, :template, :placeholder, :content, :translation_key, :options, :template_path
 
     def initialize(col_name, *options)
 
@@ -9,10 +9,12 @@ module TableSortable
       value = options[:value] || col_name
       content = options[:content] || value
       translation_key = options[:translation_key]
+      template_path = options[:template_path]
       label = options[:label] || (options[:label] == false ? '' : I18n.translate("table_sortable.#{"#{translation_key}." if translation_key }#{col_name.to_s}", :default => col_name.to_s).titleize)
       placeholder = options[:placeholder] || (options[:placeholder] == false ? nil : label)
       # priority = options[:priority]
       template = options[:template] || col_name
+      column_options = options[:options] || {}
 
       # filter_defaultAttrib (data-value)
       # data-sorter (=false?)
@@ -24,6 +26,8 @@ module TableSortable
       @placeholder = placeholder
       # @sort_priority = sort_priority
       @template = template
+      @template_path = template_path
+      @options = column_options
       @filter = TableSortable::Column::Filter.new(options.merge(:column => self) )
       @sorter = TableSortable::Column::Sorter.new(options.merge(:column => self) )
 
