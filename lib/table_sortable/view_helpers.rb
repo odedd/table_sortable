@@ -23,19 +23,24 @@ module TableSortable
     end
 
     def table_sortable_headers(html_options = {})
-      controller.columns.map do |col|
+      controller.columns.map.with_index do |col, index|
         th_options = {}
         th_options['data-placeholder'] = col.placeholder if col.placeholder
         # th_options['data-priority'] = col.sort_priority if col.sort_priority
         th_options['data-filter'] = 'false' if col.filter.disabled?
         th_options['data-sorter'] = 'false' if col.sorter.disabled?
+        unless col.filter.collection.blank?
+          th_options['filter-select'] = true
+          th_options['data-filter-options'] = col.filter.collection
+        end
         th_options['data-value'] = col.filter.default_value if col.filter.default_value
         th_options.merge!(html_options)
 
         begin
-          render partial: "#{controller_path}/table_sortable/#{col.template}_header.html",
+          render partial: "#{col.template_path || controller_path}/table_sortable/#{col.template}_header.html",
                  locals: {label: col.label,
-                          column: col}
+                          column: col,
+                          index: index}
         rescue ActionView::MissingTemplate
           content_tag :th, th_options do
             col.label
@@ -45,17 +50,18 @@ module TableSortable
     end
 
     def table_sortable_columns(record, html_options = {})
-      controller.columns.map do |col|
+      controller.columns.map.with_index do |col, index|
         td_options = {}
         td_options['data-text'] = col.value(record) if col.value(record) != col.content(record)
         td_options.merge!(html_options)
 
         begin
-          render partial: "#{controller_path}/table_sortable/#{col.template}_column.html",
+          render partial: "#{col.template_path || controller_path}/table_sortable/#{col.template}_column.html",
                  locals: {content: col.content(record),
                           value: col.value(record),
                           source: record,
-                          column: col}
+                          column: col,
+                          index: index}
         rescue ActionView::MissingTemplate
           content_tag :td, td_options do
             col.value(record)
