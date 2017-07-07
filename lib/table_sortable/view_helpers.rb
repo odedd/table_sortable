@@ -39,10 +39,10 @@ module TableSortable
         end
         th_options['data-value'] = filter.default_value if filter.default_value
         th_options.merge!(html_options)
-        view_path = "#{col.template_path || controller_path}/table_sortable/"
-        view_filename = "#{col.template}_header.html"
-        if Dir.glob(File.join(Rails.root, 'app', 'views', view_path, "_#{view_filename}.*")).any?
-          render partial: File.join(view_path, view_filename),
+        view_path = col.template_path || File.join(Rails.root, 'app', 'views', "#{controller_path}/table_sortable/")
+        view_filename = "_#{col.template}_header.html"
+        if Dir.glob(File.join(view_path, "#{view_filename}.*")).any?
+          render file: File.join(view_path, view_filename),
                  locals: {label: label,
                           column: col,
                           index: index}
@@ -61,10 +61,10 @@ module TableSortable
         td_options = {}
         td_options['data-text'] = value if value != content
         td_options.merge!(html_options)
-        view_path = "#{col.template_path || controller_path}/table_sortable/"
-        view_filename = "#{col.template}_column.html"
-        if Dir.glob(File.join(Rails.root, 'app', 'views', view_path, "_#{view_filename}.*")).any?
-          render partial: File.join(view_path, view_filename),
+        view_path = col.template_path || File.join(Rails.root, 'app', 'views', "#{controller_path}/table_sortable/")
+        view_filename = "_#{col.template}_column.html"
+        if Dir.glob(File.join(view_path, "#{view_filename}.*")).any?
+          render file: File.join(view_path, view_filename),
                  locals: {content: content,
                           value: value,
                           source: record,
