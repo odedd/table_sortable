@@ -24,26 +24,31 @@ module TableSortable
 
     def table_sortable_headers(html_options = {})
       controller.columns.map.with_index do |col, index|
-        th_options = {}
-        th_options['data-placeholder'] = col.placeholder if col.placeholder
-        # th_options['data-priority'] = col.sort_priority if col.sort_priority
-        th_options['data-filter'] = 'false' if col.filter.disabled?
-        th_options['data-sorter'] = 'false' if col.sorter.disabled?
-        unless col.filter.collection.blank?
-          th_options['filter-select'] = true
-          th_options['data-filter-options'] = col.filter.collection
-        end
-        th_options['data-value'] = col.filter.default_value if col.filter.default_value
-        th_options.merge!(html_options)
+        label = col.label
+        placeholder = col.placeholder
+        filter = col.filter
 
-        begin
-          render partial: "#{col.template_path || controller_path}/table_sortable/#{col.template}_header.html",
-                 locals: {label: col.label,
+        th_options = {}
+        th_options['data-placeholder'] = placeholder if placeholder
+        # th_options['data-priority'] = col.sort_priority if col.sort_priority
+        th_options['data-filter'] = 'false' if filter.disabled?
+        th_options['data-sorter'] = 'false' if col.sorter.disabled?
+        unless filter.collection.blank?
+          th_options['filter-select'] = true
+          th_options['data-filter-options'] = filter.collection
+        end
+        th_options['data-value'] = filter.default_value if filter.default_value
+        th_options.merge!(html_options)
+        view_path = "#{col.template_path || controller_path}/table_sortable/"
+        view_filename = "#{col.template}_header.html"
+        if Dir.glob(File.join(Rails.root, 'app', 'views', view_path, "_#{view_filename}.*")).any?
+          render partial: File.join(view_path, view_filename),
+                 locals: {label: label,
                           column: col,
                           index: index}
-        rescue ActionView::MissingTemplate
+        else
           content_tag :th, th_options do
-            col.label
+            label
           end
         end
       end.join.html_safe
@@ -51,20 +56,23 @@ module TableSortable
 
     def table_sortable_columns(record, html_options = {})
       controller.columns.map.with_index do |col, index|
+        value = col.value(record)
+        content = col.content(record)
         td_options = {}
-        td_options['data-text'] = col.value(record) if col.value(record) != col.content(record)
+        td_options['data-text'] = value if value != content
         td_options.merge!(html_options)
-
-        begin
-          render partial: "#{col.template_path || controller_path}/table_sortable/#{col.template}_column.html",
-                 locals: {content: col.content(record),
-                          value: col.value(record),
+        view_path = "#{col.template_path || controller_path}/table_sortable/"
+        view_filename = "#{col.template}_column.html"
+        if Dir.glob(File.join(Rails.root, 'app', 'views', view_path, "_#{view_filename}.*")).any?
+          render partial: File.join(view_path, view_filename),
+                 locals: {content: content,
+                          value: value,
                           source: record,
                           column: col,
                           index: index}
-        rescue ActionView::MissingTemplate
+        else
           content_tag :td, td_options do
-            col.value(record)
+            value
           end
         end
       end.join.html_safe
