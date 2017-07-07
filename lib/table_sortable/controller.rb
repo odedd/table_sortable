@@ -11,10 +11,11 @@ module TableSortable
 
     module ClassMethods
       def define_columns(*args)
-
-        before_action(options) do
-          define_columns(args)
+        options = args.extract_options!
+        before_action do
+          define_columns(options)
         end
+
       end
 
       def define_column(*args)
