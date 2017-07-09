@@ -24,15 +24,13 @@ module TableSortable
       @template = template
       @template_path = template_path
 
-      view_path = @template_path || (defined?(Rails) ? File.join(Rails.root, 'app', 'views', "#{controller.controller_path}/table_sortable/") : '')
+      view_path = @template_path || (defined?(Rails) ? File.join("#{controller.controller_path}/table_sortable/") : '')
 
-      view_filename = "_#{@template}_column.html"
-      view = Dir.glob(File.join(view_path, "#{view_filename}.*"))
-      @column_partial = view.any? ? File.join(view_path, "#{view_filename}") : false
+      view_filename = "#{@template}_column.html"
+      @column_partial = controller.lookup_context.find_all(File.join(view_path, "_#{view_filename}")).any? ? File.join(view_path, "#{view_filename}") : false
 
-      view_filename = "_#{@template}_header.html"
-      view = Dir.glob(File.join(view_path, "#{view_filename}.*"))
-      @header_partial = view.any? ? File.join(view_path, "#{view_filename}") : false
+      view_filename = "#{@template}_header.html"
+      @header_partial = controller.lookup_context.find_all(File.join(view_path, "_#{view_filename}")).any? ? File.join(view_path, "#{view_filename}") : false
 
       @options = column_options
       @filter = TableSortable::Column::Filter.new(options.merge(:column => self) )

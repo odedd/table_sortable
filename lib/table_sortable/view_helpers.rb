@@ -36,7 +36,7 @@ module TableSortable
         th_options.merge!(html_options)
 
         if col.header_partial
-          render file: col.header_partial,
+          render partial: col.header_partial,
                  locals: {label: col.label,
                           column: col,
                           index: index}
@@ -48,7 +48,7 @@ module TableSortable
       end.join.html_safe
     end
 
-    def table_sortable_columns(record, html_options = {})
+    def table_sortable_columns(record, row_number, html_options = {})
       controller.columns.map.with_index do |col, index|
         value = col.value(record)
         content = col.content(record)
@@ -57,18 +57,22 @@ module TableSortable
         td_options.merge!(html_options)
 
         if col.column_partial
-          render file: col.column_partial,
-                 locals: {content: content,
-                          value: value,
-                          source: record,
-                          column: col,
-                          index: index}
+          @column_html[col.name][row_number]
         else
           content_tag :td, td_options do
             content
           end
         end
       end.join.html_safe
+    end
+
+    def table_sortable_rows(layout, collection, html_options = {})
+      @column_html = {}
+      controller.columns.select{|col| col.column_partial}.each do |col|
+        @column_html[col.name] = []
+        render partial: col.column_partial, collection: collection, as: :record, layout: '/table_sortable/capture_column.html.erb', locals: {column: col}
+      end
+      render partial: '/table_sortable/row.html.erb', layout: layout, collection: collection, as: :record, locals: {html_options: html_options}
     end
   end
 end

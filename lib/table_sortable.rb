@@ -9,7 +9,7 @@ module TableSortable
   PAGE = 'page'
   PAGESIZE = 'pagesize'
 
-  # class Engine < Rails::Engine; end
+  class Engine < Rails::Engine; end
 
 end
 
