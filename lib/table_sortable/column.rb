@@ -1,7 +1,7 @@
 module TableSortable
   class Column
 
-    attr_reader :name, :label, :filter, :sorter, :template, :placeholder, :content, :translation_key, :options, :template_path
+    attr_reader :name, :label, :filter, :sorter, :template, :placeholder, :content, :translation_key, :options, :template_path, :column_partial, :header_partial
 
     def initialize(col_name, *options)
 
@@ -12,21 +12,28 @@ module TableSortable
       template_path = options[:template_path]
       label = options[:label] || (options[:label] == false ? '' : I18n.translate("table_sortable.#{"#{translation_key}." if translation_key }#{col_name.to_s}", :default => col_name.to_s).titleize)
       placeholder = options[:placeholder] || (options[:placeholder] == false ? nil : label)
-      # priority = options[:priority]
       template = options[:template] || col_name
       column_options = options[:options] || {}
-
-      # filter_defaultAttrib (data-value)
-      # data-sorter (=false?)
+      controller = options[:controller]
 
       @name = col_name
       @value = value.respond_to?(:call) ? value : -> (record) { record.send(value) }
       @content = content.respond_to?(:call) ? content : -> (record) { record.send(content) }
       @label = label
       @placeholder = placeholder
-      # @sort_priority = sort_priority
       @template = template
       @template_path = template_path
+
+      view_path = @template_path || (defined?(Rails) ? File.join(Rails.root, 'app', 'views', "#{controller.controller_path}/table_sortable/") : '')
+
+      view_filename = "_#{@template}_column.html"
+      view = Dir.glob(File.join(view_path, "#{view_filename}.*"))
+      @column_partial = view.any? ? File.join(view_path, "#{view_filename}") : false
+
+      view_filename = "_#{@template}_header.html"
+      view = Dir.glob(File.join(view_path, "#{view_filename}.*"))
+      @header_partial = view.any? ? File.join(view_path, "#{view_filename}") : false
+
       @options = column_options
       @filter = TableSortable::Column::Filter.new(options.merge(:column => self) )
       @sorter = TableSortable::Column::Sorter.new(options.merge(:column => self) )

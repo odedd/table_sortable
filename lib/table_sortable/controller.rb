@@ -65,7 +65,7 @@ module TableSortable
 
     def define_column(col_name, *options)
       options = default_column_options.merge(options.extract_options!)
-      @columns.add(col_name, options)
+      @columns.add(col_name, options.merge(controller: self))
     end
 
     def define_column_order(*order)

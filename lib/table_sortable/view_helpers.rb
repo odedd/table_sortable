@@ -24,31 +24,25 @@ module TableSortable
 
     def table_sortable_headers(html_options = {})
       controller.columns.map.with_index do |col, index|
-        label = col.label
-        placeholder = col.placeholder
-        filter = col.filter
-
         th_options = {}
-        th_options['data-placeholder'] = placeholder if placeholder
+        th_options['data-placeholder'] = col.placeholder if col.placeholder
         # th_options['data-priority'] = col.sort_priority if col.sort_priority
-        th_options['data-filter'] = 'false' if filter.disabled?
+        th_options['data-filter'] = 'false' if col.filter.disabled?
         th_options['data-sorter'] = 'false' if col.sorter.disabled?
-        unless filter.collection.blank?
-          th_options['filter-select'] = true
-          th_options['data-filter-options'] = filter.collection
+        unless col.filter.collection.blank?
+          th_options['data-filter-options'] = col.filter.collection.to_json
         end
-        th_options['data-value'] = filter.default_value if filter.default_value
+        th_options['data-value'] = col.filter.default_value if col.filter.default_value
         th_options.merge!(html_options)
-        view_path = col.template_path || File.join(Rails.root, 'app', 'views', "#{controller_path}/table_sortable/")
-        view_filename = "_#{col.template}_header.html"
-        if Dir.glob(File.join(view_path, "#{view_filename}.*")).any?
-          render file: File.join(view_path, view_filename),
-                 locals: {label: label,
+
+        if col.header_partial
+          render file: col.header_partial,
+                 locals: {label: col.label,
                           column: col,
                           index: index}
         else
           content_tag :th, th_options do
-            label
+            col.label
           end
         end
       end.join.html_safe
@@ -61,10 +55,9 @@ module TableSortable
         td_options = {}
         td_options['data-text'] = value if value != content
         td_options.merge!(html_options)
-        view_path = col.template_path || File.join(Rails.root, 'app', 'views', "#{controller_path}/table_sortable/")
-        view_filename = "_#{col.template}_column.html"
-        if Dir.glob(File.join(view_path, "#{view_filename}.*")).any?
-          render file: File.join(view_path, view_filename),
+
+        if col.column_partial
+          render file: col.column_partial,
                  locals: {content: content,
                           value: value,
                           source: record,
@@ -72,7 +65,7 @@ module TableSortable
                           index: index}
         else
           content_tag :td, td_options do
-            value
+            content
           end
         end
       end.join.html_safe
