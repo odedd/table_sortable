@@ -35,8 +35,11 @@ module TableSortable
         th_options['data-value'] = col.filter.default_value if col.filter.default_value
         th_options.merge!(html_options)
 
-        if col.header_partial
-          render partial: col.header_partial,
+        view_path = col.template_path || (defined?(Rails) ? File.join("#{controller.controller_path}/table_sortable/") : '')
+        view_filename = "#{col.template}_header.html"
+        if controller.lookup_context.find_all(File.join(view_path, "_#{view_filename}")).any?
+
+          render partial: File.join(view_path, "#{view_filename}"),
                  locals: {label: col.label,
                           column: col,
                           index: index}
@@ -48,7 +51,7 @@ module TableSortable
       end.join.html_safe
     end
 
-    def table_sortable_columns(record, row_number, html_options = {})
+    def table_sortable_columns(record, row_number = nil, html_options = {})
       controller.columns.map.with_index do |col, index|
         value = col.value(record)
         content = col.content(record)
@@ -56,8 +59,10 @@ module TableSortable
         td_options['data-text'] = value if value != content
         td_options.merge!(html_options)
 
-        if col.column_partial
+        if row_number && @column_html[col.name]
           @column_html[col.name][row_number]
+        elsif row_number.nil? && (col_partial = partial_for(col))
+          render partial: col_partial, locals: {column: col, record: record}
         else
           content_tag :td, td_options do
             content
@@ -68,11 +73,22 @@ module TableSortable
 
     def table_sortable_rows(layout, collection, html_options = {})
       @column_html = {}
-      controller.columns.select{|col| col.column_partial}.each do |col|
-        @column_html[col.name] = []
-        render partial: col.column_partial, collection: collection, as: :record, layout: '/table_sortable/capture_column.html.erb', locals: {column: col}
+      controller.columns.each do |col|
+        col_partial = partial_for(col)
+        if col_partial
+          @column_html[col.name] = []
+          render partial: col_partial, collection: collection, as: :record, layout: '/table_sortable/capture_column.html.erb', locals: {column: col}
+        end
       end
       render partial: '/table_sortable/row.html.erb', layout: layout, collection: collection, as: :record, locals: {html_options: html_options}
+    end
+
+    private
+
+    def partial_for(col)
+      view_path = col.template_path || (defined?(Rails) ? File.join("#{controller.controller_path}/table_sortable/") : '')
+      view_filename = "#{col.template}_column.html"
+      File.join(view_path, "#{view_filename}") if controller.lookup_context.find_all(File.join(view_path, "_#{view_filename}")).any?
     end
   end
 end

@@ -1,7 +1,7 @@
 module TableSortable
   class Column
 
-    attr_reader :name, :label, :filter, :sorter, :template, :placeholder, :content, :translation_key, :options, :template_path, :column_partial, :header_partial
+    attr_reader :name, :label, :filter, :sorter, :template, :placeholder, :content, :translation_key, :options, :template_path
 
     def initialize(col_name, *options)
 
@@ -14,7 +14,6 @@ module TableSortable
       placeholder = options[:placeholder] || (options[:placeholder] == false ? nil : label)
       template = options[:template] || col_name
       column_options = options[:options] || {}
-      controller = options[:controller]
 
       @name = col_name
       @value = value.respond_to?(:call) ? value : -> (record) { record.send(value) }
@@ -23,14 +22,7 @@ module TableSortable
       @placeholder = placeholder
       @template = template
       @template_path = template_path
-
-      view_path = @template_path || (defined?(Rails) ? File.join("#{controller.controller_path}/table_sortable/") : '')
-
-      view_filename = "#{@template}_column.html"
-      @column_partial = controller.lookup_context.find_all(File.join(view_path, "_#{view_filename}")).any? ? File.join(view_path, "#{view_filename}") : false
-
-      view_filename = "#{@template}_header.html"
-      @header_partial = controller.lookup_context.find_all(File.join(view_path, "_#{view_filename}")).any? ? File.join(view_path, "#{view_filename}") : false
+      @translation_key = translation_key
 
       @options = column_options
       @filter = TableSortable::Column::Filter.new(options.merge(:column => self) )

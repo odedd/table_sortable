@@ -365,11 +365,8 @@ you may create a partial inside a `table_sortable` folder nested inside the cont
 Notice that in this case you need to manually specify the different data attributes that correspond to the behaviour you wish this column to have.
 
 The view will be supplied with four locals:
-- `source`: the source ActiveRecord object
-- `content`: the column's content to be displayed
-- `value`: the column's value
+- `record`: the source ActiveRecord object
 - `column`: the TableSortable::Column object
-- `index`: the column's index (useful for manually setting the `data-col` attribute)
 
 Here is an example of a full name column partial, in which the name links to the edit_user_path:
 ```erb
