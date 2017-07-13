@@ -19,7 +19,8 @@ module TableSortable
     end
 
     def [](name)
-      self.find{|col| col.name == name.to_sym}
+      return self.find{|col| col.name == name.to_sym} if name.is_a? String
+      super
     end
 
   end
