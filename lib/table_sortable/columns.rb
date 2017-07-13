@@ -18,5 +18,9 @@ module TableSortable
       end
     end
 
+    def [](name)
+      self.find{|col| col.name == name.to_sym}
+    end
+
   end
 end

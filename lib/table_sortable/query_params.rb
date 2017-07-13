@@ -3,7 +3,7 @@ module TableSortable
 
     attr_reader :page, :page_size
     def initialize(params, columns, column_offset = 0)
-      @page = params[PAGE].to_i
+      @page = params[PAGE] ? params[PAGE].to_i : nil
       @page_size = params[PAGESIZE].to_i
 
       # reset column filters and sorters

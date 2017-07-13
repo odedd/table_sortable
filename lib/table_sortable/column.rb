@@ -15,7 +15,7 @@ module TableSortable
       template = options[:template] || col_name
       column_options = options[:options] || {}
 
-      @name = col_name
+      @name = col_name.to_sym
       @value = value.respond_to?(:call) ? value : -> (record) { record.send(value) }
       @content = content.respond_to?(:call) ? content : -> (record) { record.send(content) }
       @label = label

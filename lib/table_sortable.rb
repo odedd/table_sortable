@@ -9,7 +9,7 @@ module TableSortable
   PAGE = 'page'
   PAGESIZE = 'pagesize'
 
-  class Engine < Rails::Engine; end
+  class Engine < Rails::Engine; end if defined?(Rails)
 
 end
 
@@ -20,8 +20,8 @@ require 'table_sortable/column/sorter'
 require 'table_sortable/column/filter'
 require 'table_sortable/column'
 require 'table_sortable/result'
-require 'table_sortable/columns'
 require 'table_sortable/version'
+require 'table_sortable/core'
 require 'table_sortable/controller'
 require 'table_sortable/query_params'
 require 'table_sortable/railtie' if defined?(Rails)
