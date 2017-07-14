@@ -1,7 +1,7 @@
 module TableSortable
   class Column
 
-    attr_reader :name, :label, :filter, :sorter, :template, :placeholder, :content, :translation_key, :options, :template_path
+    attr_reader :name, :label, :filter, :sorter, :template, :placeholder, :content, :translation_key, :options, :template_path, :includes
 
     def initialize(col_name, *options)
 
@@ -14,6 +14,7 @@ module TableSortable
       placeholder = options[:placeholder] || (options[:placeholder] == false ? nil : label)
       template = options[:template] || col_name
       column_options = options[:options] || {}
+      includes = options[:includes] || []
 
       @name = col_name.to_sym
       @value = value.respond_to?(:call) ? value : -> (record) { record.send(value) }
@@ -23,6 +24,7 @@ module TableSortable
       @template = template
       @template_path = template_path
       @translation_key = translation_key
+      @includes = [includes].flatten.map{|as| as.is_a?(Hash) ? as : {as => []}}
 
       @options = column_options
       @filter = TableSortable::Column::Filter.new(options.merge(:column => self) )
