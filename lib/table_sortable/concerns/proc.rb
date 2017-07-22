@@ -38,10 +38,10 @@ module TableSortable
         method
       end
 
-      def method(record = nil)
-        return @method if record.nil?
+      def method(scope = nil)
+        return @method if scope.nil?
         if @method == :autodetect
-          if record.class.columns.map{|col| col.name.to_sym}.include? @column.name
+          if scope.klass.columns.map{|col| col.name.to_sym}.include? @column.name
             method = :active_record
             @proc = active_record_proc
           else
