@@ -40,7 +40,7 @@ module TableSortable
     end
 
     def columns
-      @columns.sort_by(column_order)
+      @visible_columns ||= @columns.sort_by(column_order).select{|c| c.visible?}
     end
 
     # private
@@ -70,8 +70,8 @@ module TableSortable
     end
 
     def ordered_actions(record = nil)
-      filter_actions =  @columns.map{|col| col.filter }
-      sort_actions =    @columns.map{|col| col.sorter }
+      filter_actions =  columns.map{|col| col.filter }
+      sort_actions =    columns.map{|col| col.sorter }
       (filter_actions+sort_actions).sort{ |a,b| (a.method(record) && b.method(record)) ? (a.method(record) <=> b.method(record)) : b.method(record) ? 1 : -1 }
     end
 
