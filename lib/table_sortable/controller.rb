@@ -6,7 +6,7 @@ module TableSortable
     include TableSortable::Core
 
     included do
-      helper_method :columns
+      helper_method :columns, :all_columns
       prepend_before_action :initialize_table_sortable
     end
 
