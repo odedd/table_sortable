@@ -40,7 +40,7 @@ module TableSortable
     end
 
     def columns
-      @visible_columns ||= all_columns.select{|c| c.visible?}
+      all_columns.select{|c| c.visible?}
     end
 
     def all_columns

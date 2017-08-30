@@ -2,6 +2,7 @@ module TableSortable
   class Column
 
     attr_reader :name, :label, :filter, :sorter, :template, :placeholder, :content, :translation_key, :options, :template_path, :includes
+    attr_writer :visible
 
     def initialize(col_name, *options)
 
