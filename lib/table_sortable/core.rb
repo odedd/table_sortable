@@ -40,7 +40,11 @@ module TableSortable
     end
 
     def columns
-      @visible_columns ||= @columns.sort_by(column_order).select{|c| c.visible?}
+      @visible_columns ||= all_columns.select{|c| c.visible?}
+    end
+
+    def all_columns
+      @all_columns ||= @columns.sort_by(column_order)
     end
 
     # private
