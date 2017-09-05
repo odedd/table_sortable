@@ -1,8 +1,8 @@
 module TableSortable
   class Columns < Array
 
-    def initialize
-      super
+    def initialize(*args)
+      super *args
     end
 
     def add(col_name, *options)
@@ -16,6 +16,10 @@ module TableSortable
       else
         self
       end
+    end
+
+    def visible
+      Columns.new(self.select{|c| c.visible?})
     end
 
     def [](name)
