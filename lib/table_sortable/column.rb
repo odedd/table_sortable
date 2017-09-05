@@ -1,7 +1,7 @@
 module TableSortable
   class Column
 
-    attr_reader :name, :label, :filter, :sorter, :template, :placeholder, :content, :translation_key, :options, :template_path, :includes
+    attr_reader :name, :label, :filter, :sorter, :template, :placeholder, :content, :translation_key, :options, :template_path, :includes, :scope
     attr_writer :visible
 
     def initialize(col_name, *options)
@@ -16,6 +16,7 @@ module TableSortable
       template = options[:template] || col_name
       column_options = options[:options] || {}
       includes = options[:includes] || []
+      scope = options[:scope]
       visible = options[:visible].nil? ? true : options[:visible]
 
       @name = col_name.to_sym
@@ -27,6 +28,7 @@ module TableSortable
       @template_path = template_path
       @translation_key = translation_key
       @visible = visible
+      @scope = scope
       @includes = [includes].flatten.map{|as| as.is_a?(Hash) ? as : {as => []}}
 
       @options = column_options
