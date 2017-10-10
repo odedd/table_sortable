@@ -16,7 +16,7 @@ module TableSortable
       template = options[:template] || col_name
       column_options = options[:options] || {}
       includes = options[:includes] || []
-      scope = options[:scope]
+      scope = options[:scope].is_a?(Symbol) ? (-> { send(options[:scope]) }) : options[:scope]
       visible = options[:visible].nil? ? true : options[:visible]
 
       @name = col_name.to_sym
