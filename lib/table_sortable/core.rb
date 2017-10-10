@@ -68,6 +68,15 @@ module TableSortable
       scope
     end
 
+    def include_and_scope(scope)
+      includes = columns.map{|rc| rc.includes}.flatten.compact.uniq
+      the_scope = scope.includes(includes)
+      columns.map{|rc| rc.scope}.flatten.compact.uniq.each do |scope_proc|
+        the_scope = the_scope.instance_exec(&scope_proc)
+      end
+      the_scope
+    end
+
     def initialize_table_sortable
       @columns = TableSortable::Columns.new
       define_column_offset 0
