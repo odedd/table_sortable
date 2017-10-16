@@ -16,7 +16,7 @@ module TableSortable
           @method = options["#{option_name.to_s}_method".to_sym] || :autodetect
           if the_proc.respond_to? :call
             @proc = proc_wrapper(the_proc)
-            @method = detect_method(@proc)
+            @method = (@method == :autodetect) ? detect_method(@proc) : @method
           elsif !the_proc.nil?
             case @method
               when :array
