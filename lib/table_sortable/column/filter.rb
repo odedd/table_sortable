@@ -3,12 +3,13 @@ module TableSortable
     class Filter
       include TableSortable::Concerns::Proc
 
-      attr_accessor :query, :default_value, :collection
+      attr_accessor :query, :default_value, :collection, :sort_collection
 
       def initialize(*args)
         options = args.extract_options!
         @default_value = options[:filter_initial_value]
         @collection = options[:filter_collection]
+        @sort_collection = options[:filter_sort_collection] || false
         super :filter, options
       end
 

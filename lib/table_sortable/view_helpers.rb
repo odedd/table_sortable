@@ -31,6 +31,7 @@ module TableSortable
         th_options['data-sorter'] = 'false' if col.sorter.disabled?
         unless col.filter.collection.blank?
           th_options['data-filter-options'] = col.filter.collection.to_json
+          th_options['class'] = 'filter-select-nosort' unless col.filter.sort_collection
         end
         th_options['data-value'] = col.filter.default_value if col.filter.default_value
         th_options.merge!(html_options)
