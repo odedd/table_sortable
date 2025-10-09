@@ -29,14 +29,14 @@ Gem::Specification.new do |spec|
   spec.test_files    = `git ls-files -- spec/*`.split("\n")
   spec.require_paths = ["lib"]
 
-  spec.add_development_dependency "bundler", "~> 1.15"
-  spec.add_development_dependency "rake", "~> 10.0"
+  spec.add_development_dependency "bundler", ">= 1.15"
+  spec.add_development_dependency "rake", ">= 10.0"
   spec.add_development_dependency "rspec", "~> 3.4"
-  spec.add_development_dependency "sqlite3", "~> 1.3"
-  spec.add_development_dependency "factory_girl_rails", "~> 4.8"
-  spec.add_development_dependency "activerecord", '>= 4.1.0', '< 5.2'
-  spec.add_dependency "railties", '>= 4.1.0', '< 5.2'
-  spec.add_dependency "i18n", '~> 0.7'
+  spec.add_development_dependency "sqlite3", "~> 1.4"
+  spec.add_development_dependency "factory_bot_rails", "~> 6.0"  # factory_girl_rails renamed
+  spec.add_development_dependency "activerecord", '>= 4.1.0', '< 9.0'  # Support Rails 6-8
+  spec.add_dependency "railties", '>= 4.1.0', '< 9.0'  # Support Rails 6-8
+  spec.add_dependency "i18n", '>= 0.7'  # Support all versions
 
   # spec.add_dependency "activesupport", '~> 5.1', '>= 5.1.1'
 end
