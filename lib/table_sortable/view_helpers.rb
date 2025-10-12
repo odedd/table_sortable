@@ -37,10 +37,13 @@ module TableSortable
         th_options.merge!(html_options)
 
         view_path = col.template_path || (defined?(Rails) ? File.join("#{controller.controller_path}/table_sortable/") : '')
-        view_filename = "#{col.template}_header.html"
-        if controller.lookup_context.find_all(File.join(view_path, "_#{view_filename}")).any?
+        view_filename = "#{col.template}_header"
+        # Rails 7.1+/8.0: lookup_context needs path without underscore, no extension, with formats option
+        if controller.lookup_context.find_all(File.join(view_path, view_filename), [], true, [], {formats: [:html]}).any?
 
-          render partial: File.join(view_path, "#{view_filename}"),
+          # Rails 7.1+/8.0: Explicitly specify HTML format when rendering from JSON context
+          render partial: File.join(view_path, view_filename),
+                 formats: [:html],
                  locals: {label: col.label,
                           column: col,
                           index: index}
@@ -63,7 +66,8 @@ module TableSortable
         if row_number && @column_html[col.name]
           @column_html[col.name][row_number]
         elsif row_number.nil? && (col_partial = partial_for(col))
-          render partial: col_partial, locals: {column: col, record: record}
+          # Rails 7.1+/8.0: Explicitly specify HTML format when rendering from JSON context
+          render partial: col_partial, formats: [:html], locals: {column: col, record: record}
         else
           content_tag :td, td_options do
             content
@@ -78,18 +82,23 @@ module TableSortable
         col_partial = partial_for(col)
         if col_partial
           @column_html[col.name] = []
-          render partial: col_partial, collection: collection, as: :record, layout: '/table_sortable/capture_column.html.erb', locals: {column: col}
+          # Rails 7.1+/8.0: Explicitly specify HTML format, remove .html.erb extension from layout path
+          render partial: col_partial, formats: [:html], collection: collection, as: :record, layout: '/table_sortable/capture_column', locals: {column: col}
         end
       end
-      render partial: '/table_sortable/row.html.erb', layout: layout, collection: collection, as: :record, locals: {html_options: html_options}
+      # Rails 7.1+/8.0: Explicitly specify HTML format, remove .html.erb extension from partial path
+      render partial: '/table_sortable/row', formats: [:html], layout: layout, collection: collection, as: :record, locals: {html_options: html_options}
     end
 
     private
 
     def partial_for(col)
       view_path = col.template_path || (defined?(Rails) ? File.join("#{controller.controller_path}/table_sortable/") : '')
-      view_filename = "#{col.template}_column.html"
-      File.join(view_path, "#{view_filename}") if controller.lookup_context.find_all(File.join(view_path, "_#{view_filename}")).any?
+      view_filename = "#{col.template}_column"
+      # Rails 7.1+/8.0: lookup_context needs path without underscore, no extension, with formats option
+      # Search for HTML partials even when called from JSON context (jbuilder)
+      lookup_path = File.join(view_path, view_filename)
+      File.join(view_path, view_filename) if controller.lookup_context.find_all(lookup_path, [], true, [], {formats: [:html]}).any?
     end
   end
 end
